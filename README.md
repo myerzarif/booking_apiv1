@@ -46,8 +46,8 @@ To reset the app:
 --------------------------
 
 ### Build Application
-- sudo docker-compose build booking_apiv1
-- sudo docker-compose up -d 
+- sudo docker compose build booking_apiv1
+- sudo docker compose up -d 
 
 --------------------------
 
