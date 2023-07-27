@@ -1,0 +1,16 @@
+.venv/
+.env
+.env.bank
+.env.deploy
+.vscode/
+__pycache__/
+db.sqlite3
+.coverage
+test*.log
+celery*.log
+project*.log*
+*mapper.json
+.DS_Store
+organize/.DS_Store
+file/upload/*
+!file/upload/.gitkeep

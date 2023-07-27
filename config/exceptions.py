@@ -1,0 +1,2 @@
+class StreamingHttpResponseException(Exception):
+    pass
