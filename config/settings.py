@@ -270,7 +270,6 @@ CORS_ORIGIN_WHITELIST = os.environ.get(
 CORS_ORIGIN_WHITELIST = [*CORS_ORIGIN_WHITELIST,
                          'http://localhost:3000',
                          'http://localhost:5000',
-                         'http://localhost:9090',
                          'http://127.0.0.1:3000'
                          ]
 
@@ -299,7 +298,7 @@ FILES_PATH = BASE_DIR / 'file' / 'upload' if os.environ.get("FILE_DIR", "/api/fi
 
 RATELIMIT_ENABLE = os.environ.get("RATELIMIT_ENABLE", True) != "False"
 
-BACKEND_URL = os.environ.get("BACKEND_URL_ADDRESS", "http://localhost:9090")
+BACKEND_URL = os.environ.get("BACKEND_URL_ADDRESS", "http://localhost:5000")
 
 FRONT_BASE_URL = os.environ.get("FRONT_BASE_URL", "http://localhost:3000")
 
@@ -309,7 +308,7 @@ EMAIL_VERIFICATION_URL = os.environ.get("EMAIL_VERIFICATION_URL", "auth/register
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024*1024*7
 
 #full part of upload dir in api responses before the name of file and other sub dirs
-FILES_DOWNLOAD_BASE_URL = os.environ.get("FILES_DOWNLOAD_BASE_URL", "http://localhost:9090/api/file/upload")
+FILES_DOWNLOAD_BASE_URL = os.environ.get("FILES_DOWNLOAD_BASE_URL", "http://localhost:5000/api/file/upload")
 
 # notify settings
 LIMIT_EMAIL_PER_MINUTE = 3

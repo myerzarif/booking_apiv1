@@ -86,8 +86,8 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - booking_apiv1_static:/apiv1/static
-      - booking_apiv1_file:/apiv1/file/upload
+      - booking_apiv1_static:/booking_apiv1/static
+      - booking_apiv1_file:/booking_apiv1/file/upload
 
     networks:
       - booking_apiv1_network
