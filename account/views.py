@@ -17,6 +17,9 @@ from .serializers import (
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
 from django.contrib.auth.hashers import check_password
+from common.pagination import MediumResultsSetPagination
+from django_filters import rest_framework as filters
+from rest_framework import filters as rest_filter
 
 
 class LoginView(LoggerMixin, generics.GenericAPIView):
@@ -68,7 +71,7 @@ class RegisterView(LoggerMixin, generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         confirm_password_validator(request.data)
         self.perform_create(serializer)
-        new_data = { **serializer.data }
+        new_data = {**serializer.data}
         new_data.pop("password")
         return Response(new_data, status=status.HTTP_201_CREATED)
 
@@ -77,16 +80,23 @@ class RegisterView(LoggerMixin, generics.GenericAPIView):
         return obj
 
 
-class UserDetailView(LoggerMixin, generics.RetrieveAPIView):
+class UserDetailView(LoggerMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    Get User
+    Get, Update, Delete User
     """
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    name = "user"
 
     def get_queryset(self):
-        return User.objects.filter(pk=self.request.user.id)
+        return User.objects.filter(pk=self.request.parser_context['kwargs'].get('pk'))
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user.role == User.UserRole.TECH:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(data={'detail': 'User deleted!'}, status=200)
+        else:
+            return Response(data={'detail': 'You don''t have access to delete user'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(LoggerMixin, generics.GenericAPIView):
@@ -99,3 +109,18 @@ class LogoutView(LoggerMixin, generics.GenericAPIView):
     def post(self, request):
         request.auth.delete()
         return Response(data={"detail": "Logout Successfully!"}, status=200)
+
+
+class UserView(LoggerMixin, generics.ListCreateAPIView):
+    """
+    List and Create User
+    """
+    serializer_class = UserSerializer
+    pagination_class = MediumResultsSetPagination
+    filter_backends = [filters.DjangoFilterBackend, rest_filter.SearchFilter]
+    search_fields = ["email"]
+    permission_classes = [permissions.IsAuthenticated]
+    name = "user"
+
+    def get_queryset(self):
+        return User.objects.all().filter(active=True)
