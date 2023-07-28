@@ -47,31 +47,31 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if request:
             logged_in_user = request.user
         if logged_in_user.role in [User.UserRole.TECH, User.UserRole.ADMIN]:
-            # only tech and admin can change the status of a user
-            if attr in ["status"]:
-                setattr(instance, attr, value)
-            else:
-                raise exceptions.PermissionDenied()
+                #only tech and admin can change the status of a user
+                if "status" in validated_data:
+                    setattr(instance, "status", validated_data["status"])
+                else:
+                    raise exceptions.PermissionDenied()
         if logged_in_user.role == User.UserRole.TECH:
-            # only tech can change email
-            if attr in ["email"]:
-                setattr(instance, attr, value)
-            else:
-                raise exceptions.PermissionDenied()
-        if attr in ["role"]:
-            # only user with higher role can change role of other users
+                #only tech can change email
+                if "email" in validated_data:
+                    setattr(instance, "email", validated_data["email"])
+                else:
+                    raise exceptions.PermissionDenied()
+        if "role" in validated_data:
+            #only user with higher role can change role of other users
             if logged_in_user.role == User.UserRole.TECH or \
-                    (logged_in_user.role == User.UserRole.ADMIN and instance.role != User.UserRole.TECH):
-                # prevent user to downgrade or change his role
+                (logged_in_user.role == User.UserRole.ADMIN and instance.role != User.UserRole.TECH):
+                #prevent user to downgrade or change his role
                 if logged_in_user.id != instance.id:
-                    setattr(instance, attr, value)
+                    setattr(instance, "role", validated_data["role"])
             else:
                 raise exceptions.PermissionDenied()
-
+            
         for attr, value in validated_data.items():
             if attr in ["first_name", "last_name", "mobile", "job_title"]:
                 setattr(instance, attr, value)
-
+    
         instance.save()
         return instance
 
