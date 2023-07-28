@@ -86,3 +86,6 @@ To reset the app:
 - docker exec -it booking_apiv1 python manage.py createsuperuser
 
 --------------------------
+
+## db
+psql postgresql://bookingusr:R016eJ9Gej7@localhost:5434/bookingdb
