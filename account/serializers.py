@@ -10,7 +10,6 @@ from django_restql.mixins import DynamicFieldsMixin
 from .models import AccessToken, User
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from common.tasks import send_email_celery, send_sms_celery
 from django.contrib.auth.hashers import make_password

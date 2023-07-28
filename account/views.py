@@ -115,6 +115,14 @@ class LogoutView(LoggerMixin, generics.GenericAPIView):
         return Response(data={"detail": "Logout Successfully!"}, status=200)
 
 
+class UserInfoView(LoggerMixin, generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(data=serializer.data, status=200)
+
+
 class UserView(LoggerMixin, generics.ListCreateAPIView):
     """
     List and Create User
