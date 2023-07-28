@@ -13,6 +13,11 @@ from django.contrib.auth.hashers import make_password
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from common.tasks import send_email_celery, send_sms_celery
+from django.contrib.auth.hashers import make_password
+from common.utils import generate_strong_password
+from common.tasks import send_email_celery
+from django.conf import settings
+import logging
 from .validators import (
     email_validator,
     password_validator,
@@ -21,6 +26,7 @@ from .validators import (
     username_type,
 )
 
+logger = logging.getLogger('project.account')
 
 class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Serializer For User Model"""
@@ -75,6 +81,30 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     
         instance.save()
         return instance
+
+
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+
+        if request.user.role not in [User.UserRole.TECH, User.UserRole.ADMIN]:
+            raise exceptions.PermissionDenied()
+
+        password = generate_strong_password()
+        send_email_celery(
+            subject="New User",
+            to=validated_data["email"],
+            title="Dear {0}".format(validated_data["email"]),
+            start_lines=['Please find below credentials regarding to your account in Booking Platform',
+                            'Username: {}'.format(validated_data["email"]), 'Password: {}'.format(password)],
+            links=[
+                {'url': settings.FRONT_BASE_URL, 'text': 'Backoffice URL'}
+            ],
+            cc=''
+        )
+
+        validated_data["password"] = make_password(password)
+        validated_data["status"] = User.UserStatus.ACTIVE
+        return super().create(validated_data)
 
 
 class AccessTokenSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
