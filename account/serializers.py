@@ -40,24 +40,25 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "status",
         ]
         read_only_fields = ['id']
-
+    
     def update(self, instance, validated_data):
         logged_in_user = None
         request = self.context.get('request', None)
         if request:
             logged_in_user = request.user
-        if logged_in_user.role in [User.UserRole.TECH, User.UserRole.ADMIN]:
-                #only tech and admin can change the status of a user
-                if "status" in validated_data:
-                    setattr(instance, "status", validated_data["status"])
-                else:
-                    raise exceptions.PermissionDenied()
-        if logged_in_user.role == User.UserRole.TECH:
-                #only tech can change email
-                if "email" in validated_data:
-                    setattr(instance, "email", validated_data["email"])
-                else:
-                    raise exceptions.PermissionDenied()
+            
+        if "status" in validated_data:
+            #only tech and admin can change the status of a user
+            if logged_in_user.role in [User.UserRole.TECH, User.UserRole.ADMIN]:
+                setattr(instance, "status", validated_data["status"])
+            else:
+                raise exceptions.PermissionDenied()
+        if "email" in validated_data:
+            #only tech can change email
+            if logged_in_user.role == User.UserRole.TECH:
+                setattr(instance, "email", validated_data["email"])
+            else:
+                raise exceptions.PermissionDenied()
         if "role" in validated_data:
             #only user with higher role can change role of other users
             if logged_in_user.role == User.UserRole.TECH or \
