@@ -12,11 +12,15 @@ from .serializers import (
     AccessTokenSerializer,
     LoginSerializer,
     RegisterSerializer,
-    UserSerializer
+    UserSerializer,
+    ChangePasswordSerializer,
+    ForgotPasswordSerializer,
+    ResetPasswordSerializer,
+    EmailVerificationSerializer,
 )
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from common.pagination import MediumResultsSetPagination
 from django_filters import rest_framework as filters
 from rest_framework import filters as rest_filter
@@ -124,3 +128,86 @@ class UserView(LoggerMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         return User.objects.all().filter(active=True)
+
+
+class ChangePasswordView(LoggerMixin, generics.GenericAPIView):
+    """
+    Change Password for a Logged in User
+    """
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_obj = serializer.validate_user(request.user.email)
+        origin = request.META.get('HTTP_ORIGIN')
+        request.auth.delete()
+        token = AccessToken.objects.create(user=user_obj, origin=origin or "",
+                                           user_agent=get_user_agent_header(request))
+        user_obj.password = make_password(serializer.validated_data["new_password"])
+        user_obj.last_login = timezone.now()
+        user_obj.save()
+        data = AccessTokenSerializer(instance=token, context={'request': request}).data
+        return Response(data=data, status=200)
+
+
+class SendResetPasswordTokenView(LoggerMixin, generics.GenericAPIView):
+    """
+    Generate a reset password token and send it via email
+    """
+    serializer_class = ForgotPasswordSerializer
+    permission_classes = []
+
+    def post(self, request):
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.send_password_reset_url()
+        return Response(data={"detail": "Password reset email will be sent!"}, status=201)
+
+
+class ResetPasswordView(LoggerMixin, generics.GenericAPIView):
+    """
+    Reset the forgotten password based on user_id and token
+    """
+    serializer_class = ResetPasswordSerializer
+    permission_classes = []
+
+    def post(self, request):
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_obj = serializer.get_user()
+        
+        # ? IS IT OK TO LOG USER IN WITH NEW PASSWORD?
+        origin = request.META.get('HTTP_ORIGIN')
+        token = AccessToken.objects.create(user=user_obj, origin=origin or "",
+                                           user_agent=get_user_agent_header(request))
+        user_obj.password = make_password(serializer.validated_data["new_password"])
+        user_obj.last_login = timezone.now()
+        user_obj.save()
+        data = {'detail': 'Reset Password Done!'}
+        return Response(data=data, status=200)
+
+
+class EmailVerificationView(LoggerMixin, generics.GenericAPIView):
+    """
+    verify email based on user_id and token
+    """
+    serializer_class = EmailVerificationSerializer
+    permission_classes = []
+
+    def post(self, request):
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_obj = serializer.verify_token()
+        
+        # ? IS IT OK TO LOG USER IN WITH NEW PASSWORD?
+        user_obj.email_verified = True
+        user_obj.status = User.UserStatus.ACTIVE
+        user_obj.save()
+        data = {'detail': 'email is verified!'}
+        return Response(data=data, status=200)

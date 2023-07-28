@@ -180,10 +180,9 @@ class ChangePasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
             validated_data["email"] = loggedUser
 
         validate_email(loggedUser, validated_data["email"])
-        validate_confirm(
-            validated_data["new_password"], validated_data.get("confirm_password"))
+        validate_confirm(validated_data["new_password"], validated_data.get("confirm_password"))
         password_validator(validated_data["new_password"])
-
+        
         try:
             user = User.objects.get(email=validated_data["email"])
             if not user.check_password(validated_data["old_password"]):
@@ -208,25 +207,24 @@ class ForgotPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
         try:
             if usernameType == "email":
                 user = User.objects.get(email=username)
-            elif usernameType == "phone":
+            elif usernameType =="phone":    
                 user = User.objects.get(mobile=username)
-            elif usernameType == "uuid":
+            elif usernameType =="uuid":    
                 user = User.objects.get(id=username)
         except User.DoesNotExist:
             raise exceptions.NotFound("The user does not exist!")
-
-        username_base64 = urlsafe_base64_encode(force_bytes(username))
+        
         return {
-            'token': PasswordResetTokenGenerator().make_token(user),
+            'token': PasswordResetTokenGenerator().make_token(user), 
             'user_id': user.id,
             'user': user,
             'username_type': usernameType,
             'username': username,
-        }
+            }
 
     def send_password_reset_url(self):
         token_object = self.get_password_reset_token_object()
-
+        
         reset_password_url = '{0}/{1}/{2}/{3}'.format(
             settings.FRONT_BASE_URL,
             settings.RESET_PASSWORD_URL,
@@ -240,17 +238,16 @@ class ForgotPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
                     to=token_object["username"],
                     title="Dear {0}".format(token_object["username"]),
                     start_lines=['Please click on below link and select a new password.',
-                                 'Don''t share this link with anyone.', ''],
+                                'Don''t share this link with anyone.',''],
                     links=[
-                        {'url': reset_password_url, 'text': 'Reset password URL'}
+                    {'url': reset_password_url, 'text': 'Reset password URL'}
                     ],
                     cc=''
                 )
             elif token_object['username_type'] == 'phone':
                 send_sms_celery(
                     msisdn=token_object["username"],
-                    body='Please click on below link and select a new password.\nDon''t share this link with anyone.\n{0}'.format(
-                        reset_password_url),
+                    body='Please click on below link and select a new password.\nDon''t share this link with anyone.\n{0}'.format(reset_password_url),
                 )
         except Exception as e:
             raise Exception("Something went wrong: {0}".format(str(e)))
@@ -269,8 +266,7 @@ class ResetPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
 
     def get_user(self):
         validated_data = self.validated_data
-        validate_confirm(
-            validated_data["new_password"], validated_data.get("confirm_password"))
+        validate_confirm(validated_data["new_password"], validated_data.get("confirm_password"))
         password_validator(validated_data["new_password"])
         user = None
         # username = force_text(urlsafe_base64_decode(validated_data["username_base64"]))
@@ -280,10 +276,9 @@ class ResetPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise exceptions.NotFound("The user does not exist!")
-
+        
         if not PasswordResetTokenGenerator().check_token(user, token):
-            raise exceptions.ValidationError(
-                "The URL is expired or is incorrect!")
+            raise exceptions.ValidationError("The URL is expired or is incorrect!")
         return user
 
 
@@ -304,8 +299,7 @@ class EmailVerificationSerializer(DynamicFieldsMixin, serializers.Serializer):
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise exceptions.NotFound("The user does not exist!")
-
+        
         if not PasswordResetTokenGenerator().check_token(user, token):
-            raise exceptions.ValidationError(
-                "The URL is expired or is incorrect!")
+            raise exceptions.ValidationError("The URL is expired or is incorrect!")
         return user
