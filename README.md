@@ -19,6 +19,7 @@
 - Now you should be able to see the doc page: http://localhost:5000/help-swagger
 
 To reset the app:
+- sudo docker-compose down; sudo docker-compose up -d
 - docker compose down; docker compose up -d
 --------------------------
 
