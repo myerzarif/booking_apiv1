@@ -1,6 +1,7 @@
 """Url Routes for Account App"""
 
 from django.urls import path
+from django.conf import settings
 from .views import (
     LoginView,
     LogoutView,
@@ -11,7 +12,8 @@ from .views import (
     SendResetPasswordTokenView,
     ResetPasswordView,
     EmailVerificationView,
-    UserInfoView
+    UserInfoView,
+    GetPasswordTokenView
 )
 
 app_name = 'account'
@@ -28,3 +30,6 @@ urlpatterns = [
     path('user/password/reset', ResetPasswordView.as_view(), name='reset_password'),
     path('user/verify_email', EmailVerificationView.as_view(), name='verify_email'),
 ]
+
+if settings.ENVIRONMENT_APP == 'DEVELOPE':
+    urlpatterns.append(path('user/password/get_token', GetPasswordTokenView.as_view(), name='get_password_token'))

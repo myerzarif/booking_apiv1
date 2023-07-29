@@ -16,7 +16,6 @@ class AccountTest(TestCase):
         
         self.register_data = {
             "email": "test1@email.test",
-            "address": "Address 1 Address 1 Address 1",
             "password": "Test123456$",
             "confirm_password": "Test123456$",
         }
@@ -65,9 +64,6 @@ class AccountTest(TestCase):
         client = Client()
         response = client.post(reverse('account:register'),
                                data={**self.register_data, 'email': 'asndidu'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        response = client.post(reverse('account:register'),
-                               data={**self.register_data, 'address': '1234'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         response = client.post(reverse('account:register'),
                                data={**self.register_data, "password": "!123qwE@pss", "confirm_password": "123"})

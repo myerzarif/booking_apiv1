@@ -24,6 +24,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from common.pagination import MediumResultsSetPagination
 from django_filters import rest_framework as filters
 from rest_framework import filters as rest_filter
+from django.conf import settings
 
 
 class LoginView(LoggerMixin, generics.GenericAPIView):
@@ -33,7 +34,7 @@ class LoginView(LoggerMixin, generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = []
 
-    @method_decorator(ratelimit(key='post:email', method="POST", rate='6/m', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='20/m', block=True))
     def post(self, request):
         """Post Method View"""
         self.data = request.data
@@ -41,18 +42,13 @@ class LoginView(LoggerMixin, generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user_obj = serializer.get_user()
         if not check_password(serializer.validated_data["password"], user_obj.password):
-            raise exceptions.ValidationError(
-                detail="Incorrect Password!")
-
+            raise exceptions.ValidationError("Incorrect Password!")
         origin = request.META.get('HTTP_ORIGIN')
         token = AccessToken.objects.create(user=user_obj, origin=origin or "",
                                            user_agent=get_user_agent_header(request))
         user_obj.last_login = timezone.now()
         user_obj.save()
-        data = {
-            "access_token": AccessTokenSerializer(instance=token,
-                                                  context={'request': request}).data
-        }
+        data = AccessTokenSerializer(instance=token, context={'request': request}).data
         return Response(data=data, status=200)
 
 
@@ -219,3 +215,19 @@ class EmailVerificationView(LoggerMixin, generics.GenericAPIView):
         user_obj.save()
         data = {'detail': 'email is verified!'}
         return Response(data=data, status=200)
+
+class GetPasswordTokenView(LoggerMixin, generics.GenericAPIView):
+    """
+    Generate a reset password token and return
+    """
+    serializer_class = ForgotPasswordSerializer
+    permission_classes = []
+
+    def post(self, request):
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if settings.ENVIRONMENT_APP != 'DEVELOPE':
+            raise exceptions.ValidationError("Only for test purposes!")
+        data = serializer.get_password_reset_token_object()
+        return Response(data={'token': data['token'], 'user_id': data['user_id'],}, status=200)
