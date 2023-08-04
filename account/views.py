@@ -125,13 +125,12 @@ class UserView(LoggerMixin, generics.ListCreateAPIView):
     """
     serializer_class = UserSerializer
     pagination_class = MediumResultsSetPagination
-    filter_backends = [filters.DjangoFilterBackend, rest_filter.SearchFilter]
-    search_fields = ["email"]
+    filter_fields = ('email', 'first_name', 'last_name', 'mobile')
     permission_classes = [permissions.IsAuthenticated]
     name = "user"
 
     def get_queryset(self):
-        return User.objects.all().filter(active=True)
+        return User.objects.filter(active=True)
 
 
 class ChangePasswordView(LoggerMixin, generics.GenericAPIView):
