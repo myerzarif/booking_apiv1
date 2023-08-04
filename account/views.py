@@ -8,6 +8,7 @@ from rest_framework import generics, exceptions, permissions
 from account.models import User
 from .models import AccessToken, User
 from .validators import confirm_password_validator
+from .filters import UserFilter
 from .serializers import (
     AccessTokenSerializer,
     LoginSerializer,
@@ -16,7 +17,7 @@ from .serializers import (
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
-    EmailVerificationSerializer,
+    EmailVerificationSerializer
 )
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
@@ -125,7 +126,9 @@ class UserView(LoggerMixin, generics.ListCreateAPIView):
     """
     serializer_class = UserSerializer
     pagination_class = MediumResultsSetPagination
-    filter_fields = ('email', 'first_name', 'last_name', 'mobile', 'role')
+    filter_backends = [filters.DjangoFilterBackend, rest_filter.SearchFilter]
+    filterset_class = UserFilter
+    search_fields = ('email', 'first_name', 'last_name', 'mobile', 'role')
     permission_classes = [permissions.IsAuthenticated]
     name = "user"
 
