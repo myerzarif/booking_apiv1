@@ -125,7 +125,7 @@ class UserView(LoggerMixin, generics.ListCreateAPIView):
     """
     serializer_class = UserSerializer
     pagination_class = MediumResultsSetPagination
-    filter_fields = ('email', 'first_name', 'last_name', 'mobile')
+    filter_fields = ('email', 'first_name', 'last_name', 'mobile', 'role')
     permission_classes = [permissions.IsAuthenticated]
     name = "user"
 
