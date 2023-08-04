@@ -56,17 +56,17 @@ def send_email(*args, **kwargs):
     msg_text = MIMEText(mail_message, 'html')
     msg_alternative.attach(msg_text)
 
-    fp = open('static/img/header-new.png', 'rb')
-    msg_header = MIMEImage(fp.read())
-    fp.close()
-    msg_header.add_header('Content-ID', '<header>')
-    msg_root.attach(msg_header)
+    # fp = open('static/img/header-new.png', 'rb')
+    # msg_header = MIMEImage(fp.read())
+    # fp.close()
+    # msg_header.add_header('Content-ID', '<header>')
+    # msg_root.attach(msg_header)
 
-    fp = open('static/img/footer-new.png', 'rb')
-    msg_footer = MIMEImage(fp.read())
-    fp.close()
-    msg_footer.add_header('Content-ID', '<footer>')
-    msg_root.attach(msg_footer)
+    # fp = open('static/img/footer-new.png', 'rb')
+    # msg_footer = MIMEImage(fp.read())
+    # fp.close()
+    # msg_footer.add_header('Content-ID', '<footer>')
+    # msg_root.attach(msg_footer)
 
     try:
         tos = to.split(',')
@@ -84,10 +84,7 @@ def send_email(*args, **kwargs):
                     'error': str(e),
                 }, exc_info=True)
     logger.info('recipients: {0}\nsubject: {1}\nbody:{2}'.format(
-        to + ', ' + cc + ', ' + bcc, 
-        subject, 
-        '\n'.join(start_lines + [x['link'] for x in links] + ending_lines)
-        ))
+        to + ', ' + cc + ', ' + bcc,  subject , title ))
 
 
 def send_sms(**kwargs):
