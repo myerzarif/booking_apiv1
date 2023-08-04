@@ -1,0 +1,82 @@
+<table>
+    <tbody>
+    <!-- <tr>
+        <td colspan="5" style="padding:0in 0in 0in 0in">
+            <img width="660" height="auto" src="cid:header" class="CToWUd">
+        </td>
+    </tr> -->
+    <tr>
+        <td width="30" style="width:22.5pt;padding:0in 0in 0in 0in"></td>
+        <td width="600" style="width:450pt;padding:0in 0in 0in 0in">
+            <div>
+                <p class="MsoNormal" style="line-height:12.75pt"><br/>
+                    <strong>
+                        <span style="font-size:11pt; color: #33557d;font-family:Calibri,sans-serif"><br/>
+                            {{ title }}
+                        </span>
+                    </strong>
+                    <span style="font-size:11pt;color: #33557d; font-family:Calibri,sans-serif"><br/><br/>
+                        {% for line in start_lines %}
+                            {{ line }}<br/>
+                        {% endfor %}
+					</span>
+                    {% if table %}
+                        <div><br/>
+                            <table style="border-collapse: collapse;font-size:10pt;color: #003366;font-family:Calibri,sans-serif; ">
+                                {% for row in table %}
+                                    <tr>
+                                        <td style="border: 1px solid #404040;padding: 5px;"><b>{{ row.key }}</b></td>
+                                        <td style="border: 1px solid #404040;padding: 5px;">
+                                            {% for line in row.values %}
+                                                {{ line }}<br/>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% endif %}
+                {% if  ending_lines %}
+                    <span style="font-size:11pt; color:#33557d;font-family:Calibri,sans-serif"><br/>
+                        {% for line in ending_lines %}
+                            {{ line }}<br/>
+                        {% endfor %}
+					</span>
+                {% endif %}
+                
+                {% for link in links %}
+                    <br/>
+                    <a href="{{ link.url }}" target="_blank">{{ link.text }}</a>
+                {% endfor %}
+                </p>
+                <p class="MsoNormal" style="line-height:12.75pt">
+                    <b>
+                        <span style="font-size:10pt;color:#33557d;font-family:Calibri,sans-serif">
+                            <br/><br/>
+                            <strong>
+                                <span style="font-family:Calibri,sans-serif">Best Regards,</span><br/>
+                                <span style="font-family:Calibri,sans-serif">{{ sender }}</span>
+                            </strong>
+                        </span>
+                    </b>
+                </p>
+            </div>
+        </td>
+        <td width="30" style="width:22.5pt;padding:0in 0in 0in 0in"></td>
+        <td style="padding:0in 0in 0in 0in"></td>
+        <td style="padding:0in 0in 0in 0in"></td>
+    </tr>
+    <!-- <tr>
+        <td colspan="5" style="padding:0in 0in 0in 0in">
+            <img width="660" height="auto" src="cid:footer" class="CToWUd">
+        </td>
+    </tr> -->
+    <tr>
+        <td colspan="5" style="padding:0in 0in 0in 0in">
+            <p align="center" style="text-align:center">
+                <span style="font-size:7.5pt">Please DO NOT reply on this email which generated automatically.</span>
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
