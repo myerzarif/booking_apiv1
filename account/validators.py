@@ -9,9 +9,9 @@ def password_validator(value):
     if wrong raise exception
     return None
     """
-    password_pattern = re.compile(r'^[a-zA-Z0-9@!\#\-\\ \_\$\%\^\*\&\(\)]{5,140}$')
+    password_pattern = re.compile(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9@#$%^&+=]{8,140}$')
     if not password_pattern.match(value):
-        raise exceptions.ValidationError("Password length must be at least 5 characters and consists of english alphanumerics!")
+        raise exceptions.ValidationError("Password length must be at least 8 characters and consists one upercase, one lowercase and one digit!")
     # password_validation.validate_password(value)    
     try: 
         password_validation.validate_password(value)
