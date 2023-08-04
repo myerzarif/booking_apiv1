@@ -302,7 +302,7 @@ BACKEND_URL = os.environ.get("BACKEND_URL_ADDRESS", "http://localhost:5000")
 
 FRONT_BASE_URL = os.environ.get("FRONT_BASE_URL", "http://localhost:3000")
 
-RESET_PASSWORD_URL = os.environ.get("RESET_PASSWORD_URL", "auth/password/reset")
+RESET_PASSWORD_URL = os.environ.get("RESET_PASSWORD_URL", "reset-password")
 EMAIL_VERIFICATION_URL = os.environ.get("EMAIL_VERIFICATION_URL", "auth/register/activation")
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024*1024*7
