@@ -6,9 +6,10 @@ from rest_framework.serializers import Serializer
 from rest_framework.response import Response
 from rest_framework import generics, exceptions, permissions
 from account.models import User
+from .filters import UserFilter
 from .models import AccessToken, User
 from .validators import confirm_password_validator
-from .filters import UserFilter
+
 from .serializers import (
     AccessTokenSerializer,
     LoginSerializer,

@@ -5,6 +5,9 @@ Utilty Module of Account App
 from uuid import uuid4
 import random
 import string
+import time
+import hashlib
+
 
 def generate_unique_id():
     return str(uuid4())
@@ -34,3 +37,13 @@ def generate_strong_password():
     random.SystemRandom().shuffle(password_list)
     password = ''.join(password_list)
     return password
+
+
+def get_current_time_in_second():
+    # get current time in seconds as integer
+    return int(round(time.time()))
+
+
+def string_to_sha256hex(text):
+    sha256 = hashlib.sha256(text.encode('UTF-8'))
+    return sha256.hexdigest()

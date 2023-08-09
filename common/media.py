@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 import logging
 
-logger = logging.getLogger('project.notify')
+logger = logging.getLogger('project.media')
 
 
 def send_email(*args, **kwargs):

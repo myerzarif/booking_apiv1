@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'file.apps.FileConfig',
     'common.apps.CommonConfig',
+    'content.apps.ContentConfig'
 ]
 
 MIDDLEWARE = [
@@ -335,3 +336,8 @@ SMS_API_AUTH_TOKEN = os.environ.get('SMS_API_AUTH_TOKEN', "")
 SMS_API_USER = os.environ.get('SMS_API_USER', "")
 SMS_API_PASS = os.environ.get('SMS_API_PASS', "")
 SMS_API_SENDER = os.environ.get('SMS_API_SENDER', "")#"+15017250604"
+
+# Hotelbeds info
+HOTELBEDS_BASE_URL = os.environ.get("HOTELBEDS_BASE_URL", "https://api.test.hotelbeds.com")
+HOTELBEDS_API_KEY = os.environ.get("HOTELBEDS_API_KEY", "70ee9c04c862f43c76bec6dff2e6a265")
+HOTELBEDS_SECRET = os.environ.get("HOTELBEDS_SECRET", "e8be986f34")
