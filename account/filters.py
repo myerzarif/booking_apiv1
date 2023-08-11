@@ -7,6 +7,8 @@ class UserFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method='filter_by_name')
     email = django_filters.CharFilter(lookup_expr='icontains')
     mobile = django_filters.CharFilter(lookup_expr='icontains')
+    first_name = django_filters.CharFilter(lookup_expr='icontains')
+    last_name = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = User
