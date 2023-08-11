@@ -5,17 +5,21 @@ from common.utils import string_to_sha256hex
 from common.types import HttpMethods
 
 
+default_params = {"fields": "all",
+                  "language": "ENG",
+                  "from": 1,
+                  "to": 1000,
+                  "useSecondaryLanguage": False}
+
+
 class Config(BaseConfig):
 
-    def __init__(self, endpoint, method=HttpMethods.GET, lastUpdateTime=None):
+    def __init__(self, endpoint, params=default_params, method=HttpMethods.GET, lastUpdateTime=None):
+        self.supplier_name = "hotelbeds"
         self.base_url = settings.HOTELBEDS_BASE_URL
         self.endpoint = endpoint
         self.method = method
-        self.params = {"fields": "all",
-                       "language": "ENG",
-                       "from": 1,
-                       "to": 100,
-                       "useSecondaryLanguage": True}
+        self.params = params
         self.data = None
         self.json = None
         self.lastUpdateTime = lastUpdateTime

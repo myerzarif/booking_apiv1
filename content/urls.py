@@ -3,11 +3,11 @@
 from django.urls import path
 from django.conf import settings
 from .views import (
-    AdhocUpdate
+    InitialStaticFilesInsert
 )
 
 app_name = 'content'
 
 urlpatterns = [
-    path('adhoc_update', AdhocUpdate.as_view(), name='adhoc_update'),
+    path('initial_static_files_insert', InitialStaticFilesInsert.as_view(), name='adhoc_update'),
 ]

@@ -9,24 +9,13 @@ class HbCountries(Countries):
 
     def __init__(self):
         self.config = Config(
-            endpoint="/hotel-content-api/1.0/locations/countries",
-            params={
-                "fields": "all",
-                "language": "ENG",
-                "from": 1,
-                "to": 203
-            })
+            endpoint="/hotel-content-api/1.0/locations/countries")
+        self.collection_name = self.get_collection_name()
 
 
 class HbDestinations(Destinations):
 
     def __init__(self):
-        self.config = Config(endpoint="/hotel-content-api/1.0/locations/destinations",
-                             params={
-                                 "fields": "all",
-                                 "language": "ENG",
-                                 "from": 1,
-                                 "to": 203,
-                                 "useSecondaryLanguage": False,
-                                 "countryCode": "AE"
-                             })
+        self.config = Config(
+            endpoint="/hotel-content-api/1.0/locations/destinations")
+        self.collection_name = self.get_collection_name()

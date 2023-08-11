@@ -13,7 +13,35 @@ services:
 
     volumes:
       - booking_apiv1_psql:/var/lib/postgresql/data
-      
+
+
+  booking_mongo:
+    image: mongo
+    container_name: booking_mongo
+    restart: always
+    env_file: .env
+    networks:
+      - booking_apiv1_network
+
+    volumes:
+      - booking_apiv1_mongo:/data/db
+
+
+  booking_mongo_express:
+    image: mongo-express
+    container_name: booking_mongo_express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: $MONGO_INITDB_ROOT_USERNAME
+      ME_CONFIG_MONGODB_ADMINPASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+      ME_CONFIG_MONGODB_SERVER: booking_mongo
+    ports:
+      - 8081:8081/tcp
+
+    networks:
+      - booking_apiv1_network
+
+
   booking_redis:
     image: redis:7
     container_name: booking_redis
@@ -21,6 +49,7 @@ services:
     env_file: .env
     networks:
       - booking_apiv1_network
+
 
   booking_apiv1:
     container_name: booking_apiv1
@@ -31,6 +60,7 @@ services:
     depends_on:
       - booking_redis
       - booking_psql
+      - booking_mongo
 
     networks:
       - booking_apiv1_network
@@ -77,6 +107,7 @@ services:
         "--max-memory-per-child=40000",
       ]
 
+
   booking_nginx:
     container_name: booking_nginx
     build:
@@ -101,6 +132,8 @@ services:
 volumes:
   booking_apiv1_static:
   booking_apiv1_file:
+  booking_apiv1_mongo:
+    external: true
   booking_apiv1_psql:
     external: true
 

@@ -2,69 +2,110 @@
 from .content import Content
 
 
-class Accomodation(Content):
-    pass
+class Accommodations(Content):
+
+    def get_collection_name(self):
+        return "accommodations"
 
 
 class Boards(Content):
-    pass
+
+    def get_collection_name(self):
+        return "boards"
 
 
 class Categories(Content):
-    pass
+
+    def get_collection_name(self):
+        return "categories"
 
 
 class Chains(Content):
-    pass
+
+    def get_collection_name(self):
+        return "chains"
 
 
 class Currencies(Content):
-    pass
+
+    def get_collection_name(self):
+        return "currencies"
 
 
 class Facilities(Content):
-    pass
+
+    def get_collection_name(self):
+        return "facilities"
 
 
 class FacilityGroups(Content):
-    pass
+
+    def get_collection_name(self):
+        return "facilityGroups"
+
+
+class FacilityTypologies(Content):
+
+    def get_collection_name(self):
+        return "facilityTypologies"
 
 
 class Issues(Content):
-    pass
+
+    def get_collection_name(self):
+        return "issues"
 
 
 class Languages(Content):
-    pass
+
+
+    def get_collection_name(self):
+        return "languages"
 
 
 class Promotions(Content):
-    pass
+
+    def get_collection_name(self):
+        return "promotions"
 
 
 class Rooms(Content):
-    pass
+
+    def get_collection_name(self):
+        return "rooms"
 
 
 class Segments(Content):
-    pass
+
+    def get_collection_name(self):
+        return "segments"
 
 
 class Terminals(Content):
-    pass
+
+    def get_collection_name(self):
+        return "terminals"
 
 
 class ImageTypes(Content):
-    pass
+
+    def get_collection_name(self):
+        return "imageTypes"
 
 
 class GroupCategories(Content):
-    pass
+
+    def get_collection_name(self):
+        return "groupCategories"
 
 
 class RateComments(Content):
-    pass
+
+    def get_collection_name(self):
+        return "rateComments"
 
 
 class RateCommentDetails(Content):
-    pass
+
+    def get_collection_name(self):
+        return "rateCommentDetails"

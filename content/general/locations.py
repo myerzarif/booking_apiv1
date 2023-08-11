@@ -3,8 +3,12 @@ from .content import Content
 
 
 class Countries(Content):
-    pass
+
+    def get_collection_name(self):
+        return "countries"
 
 
 class Destinations(Content):
-    pass
+    
+    def get_collection_name(self):
+        return "destinations"

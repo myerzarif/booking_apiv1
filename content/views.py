@@ -12,10 +12,9 @@ from common.pagination import MediumResultsSetPagination
 from django_filters import rest_framework as filters
 from rest_framework import filters as rest_filter
 from django.conf import settings
-from .hotelbeds.types import HbAccomodation
+from .hotelbeds.commands import initial_type_insert
 
-
-class AdhocUpdate(LoggerMixin, generics.GenericAPIView):
+class InitialStaticFilesInsert(LoggerMixin, generics.GenericAPIView):
     """
     Login with password
     """
@@ -24,5 +23,4 @@ class AdhocUpdate(LoggerMixin, generics.GenericAPIView):
     @method_decorator(ratelimit(key='post:username', method="POST", rate='20/m', block=True))
     def post(self, request):
         """Post Method View"""
-        accomodation = HbAccomodation()
-        return Response(data=accomodation.initial_update(), status=200)
+        return Response(data={"detail": "Successfully Inserted!"}, status=200)

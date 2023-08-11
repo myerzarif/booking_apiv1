@@ -90,6 +90,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# Postgres
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -98,9 +99,32 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": os.environ.get("POSTGRES_HOST"),
         "PORT": int(os.environ.get("POSTGRES_PORT")),
+    },
+    'mongo': {
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get("MONGODB_DATABASES_DATABASE_NAME"),
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get("MONGODB_DATABASES_DATABASE_HOST"),
+            'port': int(os.environ.get("MONGODB_DATABASES_DATABASE_PORT")),
+            'username': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
+            'password': os.environ.get("MONGO_INITDB_ROOT_PASSWORD"),
+            'authMechanism': 'SCRAM-SHA-1'
+        },
     }
 }
 
+# Mongo
+# MONGO_DB_SETTING = {
+#     'NAME': os.environ.get("MONGODB_DATABASES_DATABASE_NAME"),
+#     'CLIENT': {
+#         'host': os.environ.get("MONGODB_DATABASES_DATABASE_HOST"),
+#         'port': int(os.environ.get("MONGODB_DATABASES_DATABASE_PORT")),
+#         'username': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
+#         'password': os.environ.get("MONGO_INITDB_ROOT_PASSWORD"),
+#         'authMechanism': 'SCRAM-SHA-1'
+#     },
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -217,7 +241,15 @@ LOGGING = {
         },
         'project': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'project.log',
+            'filename': BASE_DIR / 'logs/project.log',
+            'maxBytes': 50000000,
+            'backupCount': 5,
+            'formatter': 'json',
+            'level': 'INFO',
+        },
+        'celery': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs/celery.log',
             'maxBytes': 50000000,
             'backupCount': 5,
             'formatter': 'json',
@@ -225,7 +257,7 @@ LOGGING = {
         },
         'testlogger': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'test.log',
+            'filename': BASE_DIR / 'logs/test.log',
             'maxBytes': 50000000,
             'backupCount': 5,
             'formatter': 'json',
@@ -254,10 +286,9 @@ LOGGING = {
             'handlers': ['streamer'],
             'level': 'INFO'
         },
-        'djongo': {
-            'handlers': ['streamer'],
-            'level': 'INFO',
-            'propagate': False,
+        'celery': {
+            'handlers': ['celery'],
+            'level': 'INFO'
         },
     }
 }
@@ -341,3 +372,4 @@ SMS_API_SENDER = os.environ.get('SMS_API_SENDER', "")#"+15017250604"
 HOTELBEDS_BASE_URL = os.environ.get("HOTELBEDS_BASE_URL", "https://api.test.hotelbeds.com")
 HOTELBEDS_API_KEY = os.environ.get("HOTELBEDS_API_KEY", "70ee9c04c862f43c76bec6dff2e6a265")
 HOTELBEDS_SECRET = os.environ.get("HOTELBEDS_SECRET", "e8be986f34")
+

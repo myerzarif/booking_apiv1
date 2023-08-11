@@ -24,7 +24,7 @@ class Request(object):
                 "request_time": request_time,
                 "response_time": response_time,
                 "call_duration": call_duration,
-                "response_data": str(response.json())[1000],
+                "response_data": str(response.json())[:1000],
                 "status_code": response.status_code,
                 "api_name": api_name
             }
