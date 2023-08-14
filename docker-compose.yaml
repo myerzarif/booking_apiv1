@@ -20,6 +20,8 @@ services:
     container_name: booking_mongo
     restart: always
     env_file: .env
+    ports:
+      - 27018:27017
     networks:
       - booking_apiv1_network
 

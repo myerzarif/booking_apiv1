@@ -7,6 +7,9 @@ import random
 import string
 import time
 import hashlib
+import json
+from dataclasses import asdict
+from datetime import datetime
 
 
 def generate_unique_id():
@@ -47,3 +50,18 @@ def get_current_time_in_second():
 def string_to_sha256hex(text):
     sha256 = hashlib.sha256(text.encode('UTF-8'))
     return sha256.hexdigest()
+
+
+def dataclass_to_json(instance):
+    # Convert the data class instance to a dictionary
+    data_dict = asdict(instance)
+
+    # Convert the dictionary to JSON
+    return json.dumps(data_dict)
+
+
+def convert_string_to_date(date_str, format_str):
+    if not date_str:
+        return None
+
+    return datetime.strptime(date_str, format_str).date()

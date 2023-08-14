@@ -1,5 +1,7 @@
 
 from .content import Content
+from dataclasses import dataclass
+from typing import List
 
 
 class Accommodations(Content):
@@ -14,6 +16,12 @@ class Boards(Content):
         return "boards"
 
 
+class GroupCategories(Content):
+
+    def get_collection_name(self):
+        return "groupCategories"
+
+
 class Categories(Content):
 
     def get_collection_name(self):
@@ -26,16 +34,10 @@ class Chains(Content):
         return "chains"
 
 
-class Currencies(Content):
+class Segments(Content):
 
     def get_collection_name(self):
-        return "currencies"
-
-
-class Facilities(Content):
-
-    def get_collection_name(self):
-        return "facilities"
+        return "segments"
 
 
 class FacilityGroups(Content):
@@ -50,6 +52,24 @@ class FacilityTypologies(Content):
         return "facilityTypologies"
 
 
+class Facilities(Content):
+
+    def get_collection_name(self):
+        return "facilities"
+
+
+class Rooms(Content):
+
+    def get_collection_name(self):
+        return "rooms"
+
+
+class Currencies(Content):
+
+    def get_collection_name(self):
+        return "currencies"
+
+
 class Issues(Content):
 
     def get_collection_name(self):
@@ -57,7 +77,6 @@ class Issues(Content):
 
 
 class Languages(Content):
-
 
     def get_collection_name(self):
         return "languages"
@@ -67,18 +86,6 @@ class Promotions(Content):
 
     def get_collection_name(self):
         return "promotions"
-
-
-class Rooms(Content):
-
-    def get_collection_name(self):
-        return "rooms"
-
-
-class Segments(Content):
-
-    def get_collection_name(self):
-        return "segments"
 
 
 class Terminals(Content):
@@ -91,12 +98,6 @@ class ImageTypes(Content):
 
     def get_collection_name(self):
         return "imageTypes"
-
-
-class GroupCategories(Content):
-
-    def get_collection_name(self):
-        return "groupCategories"
 
 
 class RateComments(Content):

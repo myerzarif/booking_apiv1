@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 
 class HttpMethods:
     GET = "GET"
@@ -12,3 +14,22 @@ class ContentTypes:
     FORM = "multipart/form-data"
     JSON = "application/json"
     XML = "application/xml"
+
+
+@dataclass
+class Coordinates:
+    longitude: float
+    latitude: float
+
+
+@dataclass
+class Address:
+    content: str
+    street: str
+    number: str
+
+
+@dataclass
+class Phone:
+    number: str
+    type: str

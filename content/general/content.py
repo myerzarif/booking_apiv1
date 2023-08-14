@@ -34,3 +34,23 @@ class Content():
 
     def get_full_url(self):
         return self.config.base_url + self.config.endpoint
+
+    def get_doc_by_code(self, code):
+        if not code:
+            return None
+
+        return mongo_default_db[self.collection_name].find_one({"code": code})
+
+    def get_docs_by_codes(self, codes):
+        if not codes:
+            return None
+
+        return list(mongo_default_db[self.collection_name].find({"codes": {'$in': codes}}))
+
+    def get_by_code(self, code):
+        doc = self.get_doc_by_code(code)
+        return self.get_dataclass_by_doc(doc)
+
+    def get_by_codes(self, codes):
+        docs = self.get_docs_by_codes(codes)
+        return self.get_dataclasses_by_docs(docs)

@@ -3,11 +3,12 @@
 from django.urls import path
 from django.conf import settings
 from .views import (
-    InitialStaticFilesInsert
+    HotelDetailView
 )
 
 app_name = 'content'
 
 urlpatterns = [
-    path('initial_static_files_insert', InitialStaticFilesInsert.as_view(), name='adhoc_update'),
+    path('hotels/<str:code>', HotelDetailView.as_view(), name='hotel_detail'),
+
 ]
