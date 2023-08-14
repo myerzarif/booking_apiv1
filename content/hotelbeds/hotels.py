@@ -11,7 +11,8 @@ from .types import (
     HbBoards,
     HbSegments,
     HbRooms,
-    HbTerminals
+    HbTerminals,
+    HbFacilities
 )
 from content.general.hotels import (
     Hotels,
@@ -67,7 +68,7 @@ class HbHotels(Hotels):
             email=doc.get("email"),
             phones=self.convert_phones(doc.get("phones")),
             rooms=HbRooms().get_hotelrooms_dataclasses(doc.get("rooms")),
-            facilities=None,
+            facilities=HbFacilities().get_roomfacilities_dataclasses(doc.get("facilities")),
             terminals=HbTerminals().get_hotelterminals_by_docs(doc.get("terminals")),
             interest_points=None,
             images=None,
