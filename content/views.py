@@ -4,10 +4,9 @@ from rest_framework.response import Response
 from rest_framework import generics
 from config.logger import LoggerMixin
 from .hotelbeds.hotels import HbHotels
-from content.general.hotels import Hotels
-from content.general.locations import Countries
 from dataclasses import asdict
-from django.views.decorators.cache import cache_page
+from .serializers import HotelContentSerializer, HotelContentQueryParamSerializer
+from drf_yasg.utils import swagger_auto_schema
 
 
 class HotelDetailView(LoggerMixin, generics.GenericAPIView):
@@ -16,11 +15,15 @@ class HotelDetailView(LoggerMixin, generics.GenericAPIView):
     """
     permission_classes = []
     lookup_field = 'code'
+    serializer_class = HotelContentSerializer
 
+    @swagger_auto_schema(query_serializer=HotelContentQueryParamSerializer)
     @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='50/h', block=True))
     @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='5/m', block=True))
     def get(self, request, *args, **kwargs):
-        """GET Method View"""
+        """
+        GET Hotel Info
+        """
         hotel = HbHotels().get_by_code(kwargs.get("code"),
                                        request.query_params.get("exclude", []))
         return Response(data=asdict(hotel), status=200)
