@@ -3,7 +3,7 @@ from django_restql.mixins import DynamicFieldsMixin
 from content.general.models import HotelData
 from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
-
+from typing import Literal
 
 class HotelContentSerializer(DataclassSerializer):
     """
@@ -16,4 +16,4 @@ class HotelContentSerializer(DataclassSerializer):
 
 
 class HotelContentQueryParamSerializer(serializers.Serializer):
-    exclude = serializers.ListField()
+    exclude = serializers.ListField(child=serializers.ChoiceField(['rooms', 'images', 'facilities', 'interest_points']))

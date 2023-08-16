@@ -25,7 +25,8 @@ class Role(BaseModel):
     Role Table
     """
 
-    accesses = models.ManyToManyField(Access, blank=True, related_name="access_roles")
+    accesses = models.ManyToManyField(
+        Access, blank=True, related_name="access_roles")
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=500, blank=True, null=True)
 
@@ -69,7 +70,7 @@ class User(AbstractBaseUser):
         TECH = 'Tech', gettext_lazy('TECH')
         ADMIN = 'Admin', gettext_lazy('ADMIN')
         STAFF = 'Staff', gettext_lazy('STAFF')
-    
+
     class UserStatus(models.TextChoices):
         # Actual value ↓      # ↓ Displayed on Django Admin
         INACTIVE = 'Inactive', gettext_lazy('INACTIVE')
@@ -81,7 +82,7 @@ class User(AbstractBaseUser):
     mobile = models.CharField(max_length=15, blank=True, null=True)
     job_title = models.CharField(max_length=200, blank=True, null=True)
     roles = models.ManyToManyField(Role, blank=True, related_name="role_users")
- 
+
     created_at = models.DateTimeField(default=timezone.now)
     active = models.BooleanField(default=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -111,6 +112,7 @@ class User(AbstractBaseUser):
         ordering = ["-created_at"]
         verbose_name_plural = "Users"
         verbose_name = "User"
+
 
 class AccessToken(Token):
     """

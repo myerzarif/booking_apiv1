@@ -26,4 +26,5 @@ class HotelDetailView(LoggerMixin, generics.GenericAPIView):
         """
         hotel = HbHotels().get_by_code(kwargs.get("code"),
                                        request.query_params.get("exclude", []))
-        return Response(data=HotelContentSerializer(instance=hotel).data, status=200)
+        # HotelContentSerializer(instance=hotel).data
+        return Response(data=asdict(hotel), status=200)
