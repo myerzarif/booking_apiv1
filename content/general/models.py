@@ -52,21 +52,21 @@ class FacilityGroupData:
 @dataclass
 class FacilityTypologyData:
     code: str
-    numberFlag: bool
-    logicFlag: bool
-    feeFlag: bool
-    distanceFlag: bool
-    ageFromFlag: bool
-    ageToFlag: bool
-    dateFromFlag: bool
-    dateToFlag: bool
-    timeFromFlag: bool
-    timeToFlag: bool
-    indYesOrNoFlag: bool
-    amountFlag: bool
-    currencyFlag: bool
-    appTypeFlag: bool
-    textFlag: bool
+    number_flag: bool
+    logic_flag: bool
+    fee_flag: bool
+    distance_flag: bool
+    age_from_flag: bool
+    age_to_flag: bool
+    date_from_flag: bool
+    date_to_flag: bool
+    time_from_flag: bool
+    time_to_flag: bool
+    ind_yes_or_no_flag: bool
+    amount_flag: bool
+    currency_flag: bool
+    app_type_flag: bool
+    text_flag: bool
 
 
 @dataclass

@@ -193,8 +193,20 @@ class HbFacilities(Facilities):
             endpoint="/hotel-content-api/1.0/types/facilities")
         self.collection_name = self.get_collection_name()
 
-    def get_roomfacilities_dataclasses(self, roomfacilities):
-        if not roomfacilities:
+    def get_roomstays_dataclasses(self, room_stays):
+        if not room_stays:
+            return None
+
+        return [RoomStayData(
+                facilities=self.get_roomfacilities_dataclasses(
+                    room_stay.get("roomStayFacilities")),
+                type=room_stay.get("stayType"),
+                order=int(room_stay.get("order")),
+                description=room_stay.get("description")
+                ) for room_stay in room_stays]
+
+    def get_roomfacilities_dataclasses(self, room_facilities):
+        if not room_facilities:
             return None
 
         return [RoomFacilityData(
@@ -207,7 +219,7 @@ class HbFacilities(Facilities):
                 voucher=roomfacility.get("voucher"),
                 time_from=roomfacility.get("timeFrom"),
                 time_to=roomfacility.get("timeTo"),
-                ) for roomfacility in roomfacilities]
+                ) for roomfacility in room_facilities]
 
     def get_dataclass_by_doc(self, doc):
         if not doc:
@@ -221,11 +233,12 @@ class HbFacilities(Facilities):
         )
 
     def get_by_info(self, facility_code, facility_group_code):
-        if not facility_code or facility_group_code:
+        if not facility_code or not facility_group_code:
             return None
 
         doc = mongo_default_db[self.collection_name].find_one(
-            {"code": facility_code, "facilityGroupCode": facility_group_code})
+            {"code": int(facility_code), "facilityGroupCode": int(facility_group_code)})
+
         return self.get_dataclass_by_doc(doc)
 
 
@@ -267,7 +280,7 @@ class HbRooms(Rooms):
                 room_info=self.get_by_code(hotelroom.get("roomCode")),
                 facilities=HbFacilities().get_roomfacilities_dataclasses(
                     hotelroom.get("roomFacilities")),
-                room_stays=None
+                room_stays=HbFacilities().get_roomstays_dataclasses(hotelroom.get("roomStays"))
                 ) for hotelroom in hotelrooms]
 
     def get_dataclass_by_doc(self, doc):
