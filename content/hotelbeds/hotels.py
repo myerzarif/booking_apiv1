@@ -4,6 +4,7 @@ from common.types import Coordinates, Address, Phone
 from content.general.models import HotelData, HotelRoomData
 from .locations import HbDestinations
 from common.utils import convert_string_to_date
+from cache_memoize import cache_memoize
 from .types import (
     HbCategories,
     HbChains,
@@ -12,7 +13,8 @@ from .types import (
     HbSegments,
     HbRooms,
     HbTerminals,
-    HbFacilities
+    HbFacilities,
+    HbImageTypes
 )
 from content.general.hotels import (
     Hotels,
@@ -38,7 +40,8 @@ class HbHotels(Hotels):
     def convert_phones(self, phones):
         return [Phone(number=phone.get("phoneNumber"), type=phone.get("phoneType")) for phone in phones]
 
-    def get_by_code(self, code):
+    @cache_memoize(60*60*24, args_rewrite=lambda self, code, exclude: code + exclude)
+    def get_by_code(self, code, exclude=[]):
         doc = self.get_doc_by_code(int(code))
         return HotelData(
             code=doc.get("code"),
@@ -67,11 +70,15 @@ class HbHotels(Hotels):
             city=doc.get("city", {}).get("content"),
             email=doc.get("email"),
             phones=self.convert_phones(doc.get("phones")),
-            rooms=HbRooms().get_hotelrooms_dataclasses(doc.get("rooms")),
-            facilities=HbFacilities().get_roomfacilities_dataclasses(doc.get("facilities")),
+            rooms=HbRooms().get_hotelrooms_dataclasses(
+                doc.get("rooms")) if "rooms" not in exclude else None,
+            facilities=HbFacilities().get_roomfacilities_dataclasses(
+                doc.get("facilities")) if "facilities" not in exclude else None,
             terminals=HbTerminals().get_hotelterminals_by_docs(doc.get("terminals")),
-            interest_points=None,
-            images=None,
+            interest_points=HbFacilities().get_interestpoints_dataclasses(
+                doc.get("interestPoints")) if "interest_points" not in exclude else None,
+            images=HbImageTypes().get_hotelimages_dataclasses(
+                doc.get("images")) if "images" not in exclude else None,
             web=doc.get("web"),
             last_update=convert_string_to_date(
                 doc.get("lastUpdate"), "%Y-%m-%d"),

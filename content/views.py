@@ -7,6 +7,7 @@ from .hotelbeds.hotels import HbHotels
 from content.general.hotels import Hotels
 from content.general.locations import Countries
 from dataclasses import asdict
+from django.views.decorators.cache import cache_page
 
 
 class HotelDetailView(LoggerMixin, generics.GenericAPIView):
@@ -19,10 +20,7 @@ class HotelDetailView(LoggerMixin, generics.GenericAPIView):
     @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='50/h', block=True))
     @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='5/m', block=True))
     def get(self, request, *args, **kwargs):
-        """Post Method View"""
-        hotel = HbHotels().get_by_code(kwargs.get("code"))
-        # country = Countries.CountryData("AD", "Andorra", "CA", "CANILLO")
-        # hotel = Hotels.HotelData("1234", "hotel name", "in dubai", country)
-
-        # print("find_hotel_by_code", hb.find_hotel_by_code(kwargs.get("code")))
+        """GET Method View"""
+        hotel = HbHotels().get_by_code(kwargs.get("code"),
+                                       request.query_params.get("exclude", []))
         return Response(data=asdict(hotel), status=200)

@@ -37,7 +37,9 @@ from content.general.models import (
     FacilityTypologyData,
     TerminalData,
     HotelTerminalData,
-    InterestPointData
+    InterestPointData,
+    ImageTypeData,
+    ImageData
 )
 
 
@@ -193,13 +195,28 @@ class HbFacilities(Facilities):
             endpoint="/hotel-content-api/1.0/types/facilities")
         self.collection_name = self.get_collection_name()
 
+    def get_interestpoints_dataclasses(self, interest_points):
+        if not interest_points:
+            return None
+
+        return [InterestPointData(
+                order=int(interest_point.get("order")),
+                name=interest_point.get("poiName"),
+                distance=int(interest_point.get("distance")),
+                facility=self.get_by_info(
+                    interest_point.get("facilityCode"),
+                    interest_point.get("facilityGroupCode")
+                ),
+                ) for interest_point in interest_points]
+
     def get_roomstays_dataclasses(self, room_stays):
         if not room_stays:
             return None
 
         return [RoomStayData(
                 facilities=self.get_roomfacilities_dataclasses(
-                    room_stay.get("roomStayFacilities")),
+                    room_stay.get("roomStayFacilities")
+                ),
                 type=room_stay.get("stayType"),
                 order=int(room_stay.get("order")),
                 description=room_stay.get("description")
@@ -210,8 +227,10 @@ class HbFacilities(Facilities):
             return None
 
         return [RoomFacilityData(
-                facility=self.get_by_info(roomfacility.get(
-                    "facilityCode"), roomfacility.get("facilityGroupCode")),
+                facility=self.get_by_info(
+                    roomfacility.get("facilityCode"),
+                    roomfacility.get("facilityGroupCode")
+                ),
                 ind_logic=roomfacility.get("indLogic"),
                 ind_fee=roomfacility.get("indFee"),
                 ind_yes_or_no=roomfacility.get("indYesOrNo"),
@@ -373,6 +392,27 @@ class HbImageTypes(ImageTypes):
         self.config = Config(
             endpoint="/hotel-content-api/1.0/types/imagetypes")
         self.collection_name = self.get_collection_name()
+
+    def get_dataclass_by_doc(self, doc):
+        if not doc:
+            return None
+
+        return ImageTypeData(
+            code=str(doc.get("code")),
+            description=doc.get("description", {}).get("content"),
+        )
+
+    def get_hotelimages_dataclasses(self, images):
+        if not images:
+            return None
+
+        return [ImageData(
+                type=self.get_by_code(image.get("imageTypeCode")),
+                path=image.get("path"),
+                order=image.get("order"),
+                visual_order=image.get("visualOrder"),
+                room=HbRooms().get_by_code(image.get("roomCode"))
+                ) for image in images]
 
 
 class HbRateComments(RateComments):

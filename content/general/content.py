@@ -3,6 +3,7 @@ from common.extensions import mongo_default_db
 from common.exceptions import ThirdPartyAPIFailure
 import logging
 
+
 logger = logging.getLogger('project.content')
 
 
