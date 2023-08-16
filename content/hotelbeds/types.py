@@ -318,7 +318,6 @@ class HbSegments(Segments):
 
     @check_null()
     def get_by_codes(self, codes):
-        codes = [str(code) for code in codes]
         docs = self.get_docs_by_codes(codes)
         return self.get_dataclasses_by_docs(docs)
 

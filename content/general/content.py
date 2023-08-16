@@ -39,8 +39,9 @@ class Content():
 
     @check_null()
     def get_docs_by_codes(self, codes):
-        return list(mongo_default_db[self.collection_name].find({"codes": {'$in': codes}}))
+        return list(mongo_default_db[self.collection_name].find({"code": {'$in': codes}}))
 
+    @check_null()
     def get_by_code(self, code):
         doc = self.get_doc_by_code(code)
         return self.get_dataclass_by_doc(doc)
