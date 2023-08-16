@@ -1,6 +1,7 @@
 from common.requests import requests
 from common.extensions import mongo_default_db
 from common.exceptions import ThirdPartyAPIFailure
+from common.decorators import check_null
 import logging
 
 
@@ -8,10 +9,6 @@ logger = logging.getLogger('project.content')
 
 
 class Content():
-
-    def daily_update(self):
-        print("daily_update")
-        return "daily_update"
 
     def call_initial(self):
         response = requests.send_request(url=self.get_full_url(),
@@ -36,16 +33,12 @@ class Content():
     def get_full_url(self):
         return self.config.base_url + self.config.endpoint
 
+    @check_null()
     def get_doc_by_code(self, code):
-        if not code:
-            return None
-
         return mongo_default_db[self.collection_name].find_one({"code": code})
 
+    @check_null()
     def get_docs_by_codes(self, codes):
-        if not codes:
-            return None
-
         return list(mongo_default_db[self.collection_name].find({"codes": {'$in': codes}}))
 
     def get_by_code(self, code):

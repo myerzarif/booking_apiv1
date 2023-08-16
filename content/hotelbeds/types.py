@@ -1,3 +1,7 @@
+from common.extensions import mongo_default_db
+from common.decorators import check_null
+from .config import Config
+from .locations import HbCountries
 from content.general.types import (
     Accommodations,
     Boards,
@@ -18,9 +22,6 @@ from content.general.types import (
     RateComments,
     RateCommentDetails
 )
-from .config import Config
-from common.extensions import mongo_default_db
-from .locations import HbCountries
 from content.general.models import (
     CategoryData,
     GroupCategoryData,
@@ -50,10 +51,8 @@ class HbAccommodations(Accommodations):
             endpoint="/hotel-content-api/1.0/types/accommodations")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return AccommodationData(
             code=doc.get("code"),
             description=doc.get("typeDescription")
@@ -66,17 +65,15 @@ class HbBoards(Boards):
         self.config = Config(endpoint="/hotel-content-api/1.0/types/boards")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
         return BoardData(
             code=doc.get("code"),
             description=doc.get("description", {}).get("content"),
         )
 
+    @check_null()
     def get_dataclasses_by_docs(self, docs):
-        if not docs:
-            return None
         return [self.get_dataclass_by_doc(doc) for doc in docs]
 
 
@@ -87,10 +84,8 @@ class HbGroupCategories(GroupCategories):
             endpoint="/hotel-content-api/1.0/types/groupcategories")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return GroupCategoryData(
             code=doc.get("code"),
             name=doc.get("name", {}).get("content"),
@@ -106,10 +101,8 @@ class HbCategories(Categories):
             endpoint="/hotel-content-api/1.0/types/categories")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return CategoryData(
             code=doc.get("code"),
             description=doc.get("description", {}).get("content"),
@@ -122,10 +115,8 @@ class HbChains(Chains):
         self.config = Config(endpoint="/hotel-content-api/1.0/types/chains")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return ChainData(
             code=doc.get("code"),
             description=doc.get("description", {}).get("content")
@@ -147,10 +138,8 @@ class HbFacilityGroups(FacilityGroups):
             endpoint="/hotel-content-api/1.0/types/facilitygroups")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return FacilityGroupData(
             code=str(doc.get("code")),
             description=doc.get("description", {}).get("content")
@@ -164,10 +153,8 @@ class HbFacilityTypologies(FacilityTypologies):
             endpoint="/hotel-content-api/1.0/types/facilitytypologies")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return FacilityTypologyData(
             code=str(doc.get("code")),
             number_flag=doc.get("numberFlag"),
@@ -195,10 +182,8 @@ class HbFacilities(Facilities):
             endpoint="/hotel-content-api/1.0/types/facilities")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_interestpoints_dataclasses(self, interest_points):
-        if not interest_points:
-            return None
-
         return [InterestPointData(
                 order=int(interest_point.get("order")),
                 name=interest_point.get("poiName"),
@@ -209,10 +194,8 @@ class HbFacilities(Facilities):
                 ),
                 ) for interest_point in interest_points]
 
+    @check_null()
     def get_roomstays_dataclasses(self, room_stays):
-        if not room_stays:
-            return None
-
         return [RoomStayData(
                 facilities=self.get_roomfacilities_dataclasses(
                     room_stay.get("roomStayFacilities")
@@ -222,10 +205,8 @@ class HbFacilities(Facilities):
                 description=room_stay.get("description")
                 ) for room_stay in room_stays]
 
+    @check_null()
     def get_roomfacilities_dataclasses(self, room_facilities):
-        if not room_facilities:
-            return None
-
         return [RoomFacilityData(
                 facility=self.get_by_info(
                     roomfacility.get("facilityCode"),
@@ -240,10 +221,8 @@ class HbFacilities(Facilities):
                 time_to=roomfacility.get("timeTo"),
                 ) for roomfacility in room_facilities]
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return FacilityData(
             code=str(doc.get("code")),
             description=doc.get("description", {}).get("content"),
@@ -251,10 +230,8 @@ class HbFacilities(Facilities):
             typology=HbFacilityTypologies().get_by_code(doc.get("facilityTypologyCode"))
         )
 
+    @check_null()
     def get_by_info(self, facility_code, facility_group_code):
-        if not facility_code or not facility_group_code:
-            return None
-
         doc = mongo_default_db[self.collection_name].find_one(
             {"code": int(facility_code), "facilityGroupCode": int(facility_group_code)})
 
@@ -289,10 +266,8 @@ class HbRooms(Rooms):
         self.config = Config(endpoint="/hotel-content-api/1.0/types/rooms")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_hotelrooms_dataclasses(self, hotelrooms):
-        if not hotelrooms:
-            return None
-
         return [HotelRoomData(
                 is_parent_romm=hotelroom.get("isParentRoom"),
                 pms_room_code=hotelroom.get("PMSRoomCode"),
@@ -302,10 +277,8 @@ class HbRooms(Rooms):
                 room_stays=HbFacilities().get_roomstays_dataclasses(hotelroom.get("roomStays"))
                 ) for hotelroom in hotelrooms]
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return RoomData(
             code=doc.get("code"),
             description=doc.get("description"),
@@ -321,10 +294,8 @@ class HbRooms(Rooms):
             max_children=doc.get("maxChildren"),
         )
 
+    @check_null()
     def get_dataclasses_by_docs(self, docs):
-        if not docs:
-            return None
-
         return [self.get_dataclass_by_doc(doc) for doc in docs]
 
 
@@ -334,25 +305,19 @@ class HbSegments(Segments):
         self.config = Config(endpoint="/hotel-content-api/1.0/types/segments")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return SegmentData(
             code=str(doc.get("code")),
             description=doc.get("description", {}).get("content"),
         )
 
+    @check_null()
     def get_dataclasses_by_docs(self, docs):
-        if not docs:
-            return None
-
         return [self.get_dataclass_by_doc(doc) for doc in docs]
 
+    @check_null()
     def get_by_codes(self, codes):
-        if not codes:
-            return None
-
         codes = [str(code) for code in codes]
         docs = self.get_docs_by_codes(codes)
         return self.get_dataclasses_by_docs(docs)
@@ -364,10 +329,8 @@ class HbTerminals(Terminals):
         self.config = Config(endpoint="/hotel-content-api/1.0/types/terminals")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return TerminalData(
             code=doc.get("code"),
             name=doc.get("name", {}).get("content"),
@@ -376,10 +339,8 @@ class HbTerminals(Terminals):
             country=HbCountries().get_by_code(doc.get("country"))
         )
 
+    @check_null()
     def get_hotelterminals_by_docs(self, terminals):
-        if not terminals:
-            return None
-
         return [HotelTerminalData(
                 terminal=self.get_by_code(terminal.get("terminalCode")),
                 distance=terminal.get("distance"),
@@ -393,19 +354,15 @@ class HbImageTypes(ImageTypes):
             endpoint="/hotel-content-api/1.0/types/imagetypes")
         self.collection_name = self.get_collection_name()
 
+    @check_null()
     def get_dataclass_by_doc(self, doc):
-        if not doc:
-            return None
-
         return ImageTypeData(
             code=str(doc.get("code")),
             description=doc.get("description", {}).get("content"),
         )
 
+    @check_null()
     def get_hotelimages_dataclasses(self, images):
-        if not images:
-            return None
-
         return [ImageData(
                 type=self.get_by_code(image.get("imageTypeCode")),
                 path=image.get("path"),

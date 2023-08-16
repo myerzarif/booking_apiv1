@@ -1,6 +1,7 @@
 from .config import Config
 from common.extensions import mongo_default_db
 from content.general.models import DestinationData, CountryData, ZoneData, StateData
+from common.decorators import check_null
 from content.general.locations import (
     Countries,
     Destinations,
@@ -23,14 +24,13 @@ class HbCountries(Countries):
                 )
         return None
 
+    @check_null(['doc'])
     def get_dataclass_by_doc(self, doc, state_code=None):
-        if not doc:
-            return None
-
         return CountryData(
             code=doc.get("code"),
             name=doc.get("description", {}).get("content"),
-            state=self.get_state(doc.get("states"), state_code) if state_code else None
+            state=self.get_state(
+                doc.get("states"), state_code) if state_code else None
         )
 
     def get_by_country_info(self, country_code, state_code):
@@ -55,10 +55,8 @@ class HbDestinations(Destinations):
                 )
         return None
 
+    @check_null(['doc'])
     def get_dataclass_by_doc(self, doc, state_code, zone_code):
-        if not doc:
-            return None
-
         return DestinationData(
             code=doc.get("code"),
             name=doc.get("name", {}).get("content"),
