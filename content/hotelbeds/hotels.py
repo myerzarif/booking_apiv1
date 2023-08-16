@@ -62,9 +62,9 @@ class HbHotels(Hotels):
             boards=HbBoards().get_by_codes(doc.get("boardCodes")),
             segments=HbSegments().get_by_codes(doc.get("segmentCodes")),
             address=Address(
-                content=doc.get("content"),
-                street=doc.get("street"),
-                number=doc.get("number")
+                content=doc.get("address", {}).get("content"),
+                street=doc.get("address", {}).get("street"),
+                number=doc.get("address", {}).get("number")
             ),
             postal_code=doc.get("postalCode"),
             city=doc.get("city", {}).get("content"),

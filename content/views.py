@@ -22,7 +22,7 @@ class HotelDetailView(LoggerMixin, generics.GenericAPIView):
     @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='5/m', block=True))
     def get(self, request, *args, **kwargs):
         """
-        GET Hotel Info
+        Get Hotel Info
         """
         hotel = HbHotels().get_by_code(kwargs.get("code"),
                                        request.query_params.get("exclude", []))
