@@ -90,3 +90,8 @@ To reset the app:
 ## db connections strings
 psql postgresql://bookingusr:R016eJ9Gej7@localhost:5434/bookingdb
 mongo mongodb://bookingusr:B016eJ9Gej8@localhost:27018/
+
+## mongodump and restore
+mongodump --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookingdb --authenticationDatabase=admin --out 2023-08-17
+
+mongorestore --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookingdb --authenticationDatabase=admin --drop bookingdb/

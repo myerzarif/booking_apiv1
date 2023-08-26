@@ -40,7 +40,7 @@ class HbHotels(Hotels):
     def convert_phones(self, phones):
         return [Phone(number=phone.get("phoneNumber"), type=phone.get("phoneType")) for phone in phones]
 
-    @cache_memoize(60*60*24, args_rewrite=lambda self, code, exclude: code + exclude)
+    @cache_memoize(60*60*24, args_rewrite=lambda self, code, exclude: code + str(exclude))
     def get_by_code(self, code, exclude=[]):
         doc = self.get_doc_by_code(int(code))
         return HotelData(
