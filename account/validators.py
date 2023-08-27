@@ -2,6 +2,7 @@
 import re
 from rest_framework import exceptions
 from django.contrib.auth import password_validation
+from common.types import UserType
 
 def password_validator(value):
     """
@@ -31,15 +32,17 @@ def email_validator(value):
 
 def username_type(username):
     email_pattern = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-    phone_pattern = re.compile("^\\+?\\d{1,4}?[-.\\s]?\\(?\\d{1,3}?\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$")
+    mobile_pattern = re.compile("^\\+?\\d{1,4}?[-.\\s]?\\(?\\d{1,3}?\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$")
     uuid_pattern = re.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$")
     if email_pattern.match(username):
-        return 'email'
-    elif phone_pattern.match(username):
-        return 'phone'
+        return UserType.email
+    elif mobile_pattern.match(username):
+        return UserType.mobile
     elif uuid_pattern.match(username):
-        return 'uuid'
-    return 'None'
+        return UserType.uuid
+    
+    raise exceptions.ValidationError("User type is not valid!")
+
     
 def confirm_password_validator(params):
     """

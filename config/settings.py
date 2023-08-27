@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.exceptions.ExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -99,19 +100,18 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": os.environ.get("POSTGRES_HOST"),
         "PORT": int(os.environ.get("POSTGRES_PORT")),
-    },
-    'mongo': {
-        'ENGINE': 'djongo',
-        'NAME': os.environ.get("MONGODB_DATABASES_DATABASE_NAME"),
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': os.environ.get("MONGODB_DATABASES_DATABASE_HOST"),
-            'port': int(os.environ.get("MONGODB_DATABASES_DATABASE_PORT")),
-            'username': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
-            'password': os.environ.get("MONGO_INITDB_ROOT_PASSWORD"),
-            'authMechanism': 'SCRAM-SHA-1'
-        },
     }
+}
+
+MONGO_DB_SETTING = {
+    'NAME': os.environ.get("MONGODB_DATABASES_DATABASE_NAME"),
+    'CLIENT': {
+        'host': os.environ.get("MONGODB_DATABASES_DATABASE_HOST"),
+        'port': int(os.environ.get("MONGODB_DATABASES_DATABASE_PORT")),
+        'username': os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
+        'password': os.environ.get("MONGO_INITDB_ROOT_PASSWORD"),
+        'authMechanism': 'SCRAM-SHA-1'
+    },
 }
 
 # Mongo
@@ -326,7 +326,8 @@ CACHES = {
 STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = '/static/'
 
-FILES_PATH = BASE_DIR / 'file' / 'upload' if os.environ.get("FILE_DIR", "/api/file/upload") == 'BASE_DIR' else Path("/api/file/upload")
+FILES_PATH = BASE_DIR / 'file' / 'upload' if os.environ.get(
+    "FILE_DIR", "/api/file/upload") == 'BASE_DIR' else Path("/api/file/upload")
 
 RATELIMIT_ENABLE = os.environ.get("RATELIMIT_ENABLE", True) != "False"
 
@@ -335,12 +336,14 @@ BACKEND_URL = os.environ.get("BACKEND_URL_ADDRESS", "http://localhost:5000")
 FRONT_BASE_URL = os.environ.get("FRONT_BASE_URL", "http://localhost:3000")
 
 RESET_PASSWORD_URL = os.environ.get("RESET_PASSWORD_URL", "reset-password")
-EMAIL_VERIFICATION_URL = os.environ.get("EMAIL_VERIFICATION_URL", "auth/register/activation")
+EMAIL_VERIFICATION_URL = os.environ.get(
+    "EMAIL_VERIFICATION_URL", "auth/register/activation")
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024*1024*7
 
-#full part of upload dir in api responses before the name of file and other sub dirs
-FILES_DOWNLOAD_BASE_URL = os.environ.get("FILES_DOWNLOAD_BASE_URL", "http://localhost:5000/api/file/upload")
+# full part of upload dir in api responses before the name of file and other sub dirs
+FILES_DOWNLOAD_BASE_URL = os.environ.get(
+    "FILES_DOWNLOAD_BASE_URL", "http://localhost:5000/api/file/upload")
 
 # notify settings
 LIMIT_EMAIL_PER_MINUTE = 3
@@ -357,19 +360,22 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 LIMIT_UPLOAD_PER_HOUR_BYTES = 104857600  # 1024*1024*100 -> 100 MB
 LIMIT_UPLOAD_PER_DAY_BYTES = 524288000  # 1024*1024*500 -> 500 MB
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
+CELERY_BROKER_URL = os.environ.get(
+    'CELERY_BROKER_URL', 'redis://localhost:6379')
+CELERY_RESULT_BACKEND = os.environ.get(
+    'CELERY_RESULT_BACKEND', 'redis://localhost:6379')
 CELERY_INSPECT_TIMEOUT = int(os.environ.get('CELERY_INSPECT_TIMEOUT', '1'))
 
-#TWILIO SMS CONFIGS
+# TWILIO SMS CONFIGS
 SMS_API_ACCOUNT_SID = os.environ.get('SMS_API_ACCOUNT_SID', "")
 SMS_API_AUTH_TOKEN = os.environ.get('SMS_API_AUTH_TOKEN', "")
 SMS_API_USER = os.environ.get('SMS_API_USER', "")
 SMS_API_PASS = os.environ.get('SMS_API_PASS', "")
-SMS_API_SENDER = os.environ.get('SMS_API_SENDER', "")#"+15017250604"
+SMS_API_SENDER = os.environ.get('SMS_API_SENDER', "")  # "+15017250604"
 
 # Hotelbeds info
-HOTELBEDS_BASE_URL = os.environ.get("HOTELBEDS_BASE_URL", "https://api.test.hotelbeds.com")
-HOTELBEDS_API_KEY = os.environ.get("HOTELBEDS_API_KEY", "70ee9c04c862f43c76bec6dff2e6a265")
+HOTELBEDS_BASE_URL = os.environ.get(
+    "HOTELBEDS_BASE_URL", "https://api.test.hotelbeds.com")
+HOTELBEDS_API_KEY = os.environ.get(
+    "HOTELBEDS_API_KEY", "70ee9c04c862f43c76bec6dff2e6a265")
 HOTELBEDS_SECRET = os.environ.get("HOTELBEDS_SECRET", "e8be986f34")
-

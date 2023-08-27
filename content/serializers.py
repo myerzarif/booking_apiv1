@@ -5,6 +5,7 @@ from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
 from typing import Literal, Optional
 
+
 class HotelContentSerializer(DataclassSerializer):
     """
     Serializer for Hotel Content View
@@ -16,4 +17,5 @@ class HotelContentSerializer(DataclassSerializer):
 
 
 class HotelContentQueryParamSerializer(serializers.Serializer):
-    exclude = serializers.ListField(allow_null=True, child=serializers.ChoiceField(['rooms', 'images', 'facilities', 'interest_points']))
+    exclude = serializers.ListField(allow_null=True, child=serializers.ChoiceField(
+        ['rooms', 'images', 'facilities', 'interest_points']))

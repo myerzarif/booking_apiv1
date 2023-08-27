@@ -18,7 +18,9 @@ from .serializers import (
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
-    EmailVerificationSerializer
+    EmailVerificationSerializer,
+    OtpLoginSerializer,
+    OtpVerifySerializer
 )
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
@@ -50,7 +52,8 @@ class LoginView(LoggerMixin, generics.GenericAPIView):
                                            user_agent=get_user_agent_header(request))
         user_obj.last_login = timezone.now()
         user_obj.save()
-        data = AccessTokenSerializer(instance=token, context={'request': request}).data
+        data = AccessTokenSerializer(instance=token, context={
+                                     'request': request}).data
         return Response(data=data, status=200)
 
 
@@ -115,7 +118,8 @@ class LogoutView(LoggerMixin, generics.GenericAPIView):
 
 class UserInfoView(LoggerMixin, generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
-
+    serializer_class = Serializer
+    
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(data=serializer.data, status=200)
@@ -153,10 +157,12 @@ class ChangePasswordView(LoggerMixin, generics.GenericAPIView):
         request.auth.delete()
         token = AccessToken.objects.create(user=user_obj, origin=origin or "",
                                            user_agent=get_user_agent_header(request))
-        user_obj.password = make_password(serializer.validated_data["new_password"])
+        user_obj.password = make_password(
+            serializer.validated_data["new_password"])
         user_obj.last_login = timezone.now()
         user_obj.save()
-        data = AccessTokenSerializer(instance=token, context={'request': request}).data
+        data = AccessTokenSerializer(instance=token, context={
+                                     'request': request}).data
         return Response(data=data, status=200)
 
 
@@ -187,12 +193,13 @@ class ResetPasswordView(LoggerMixin, generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_obj = serializer.get_user()
-        
+
         # ? IS IT OK TO LOG USER IN WITH NEW PASSWORD?
         origin = request.META.get('HTTP_ORIGIN')
         token = AccessToken.objects.create(user=user_obj, origin=origin or "",
                                            user_agent=get_user_agent_header(request))
-        user_obj.password = make_password(serializer.validated_data["new_password"])
+        user_obj.password = make_password(
+            serializer.validated_data["new_password"])
         user_obj.last_login = timezone.now()
         user_obj.save()
         data = {'detail': 'Reset Password Done!'}
@@ -211,13 +218,14 @@ class EmailVerificationView(LoggerMixin, generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_obj = serializer.verify_token()
-        
+
         # ? IS IT OK TO LOG USER IN WITH NEW PASSWORD?
         user_obj.email_verified = True
         user_obj.status = User.UserStatus.ACTIVE
         user_obj.save()
         data = {'detail': 'email is verified!'}
         return Response(data=data, status=200)
+
 
 class GetPasswordTokenView(LoggerMixin, generics.GenericAPIView):
     """
@@ -233,4 +241,56 @@ class GetPasswordTokenView(LoggerMixin, generics.GenericAPIView):
         if settings.ENVIRONMENT_APP != 'DEVELOPE':
             raise exceptions.ValidationError("Only for test purposes!")
         data = serializer.get_password_reset_token_object()
-        return Response(data={'token': data['token'], 'user_id': data['user_id'],}, status=200)
+        return Response(data={'token': data['token'], 'user_id': data['user_id'], }, status=200)
+
+
+class OtpLoginView(LoggerMixin, generics.GenericAPIView):
+    """
+    OTP Login 
+    """
+    serializer_class = OtpLoginSerializer
+    permission_classes = []
+
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='2/s', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='20/m', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='50/h', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='2/m', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='8/h', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='20/d', block=True))
+    def post(self, request):
+        """Post Method View"""
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.send_otp()
+
+        data = {'detail': 'OTP sent successfully!', 'token': token}
+
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+class OtpVerifyView(LoggerMixin, generics.GenericAPIView):
+    """
+    OTP Verify 
+    """
+    serializer_class = OtpVerifySerializer
+    permission_classes = []
+
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='2/s', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='20/m', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='50/h', block=True))
+    def post(self, request):
+        """Post Method View"""
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_obj = serializer.token_validate()
+        origin = request.META.get('HTTP_ORIGIN')
+        token = AccessToken.objects.create(user=user_obj, origin=origin or "",
+                                           user_agent=get_user_agent_header(request))
+        user_obj.last_login = timezone.now()
+        user_obj.save()
+        data = AccessTokenSerializer(instance=token, context={
+                                     'request': request}).data
+        return Response(data=data, status=200)

@@ -8,8 +8,10 @@ import string
 import time
 import hashlib
 import json
+import math
 from dataclasses import asdict
 from datetime import datetime
+from random import randint, randrange
 
 
 def generate_unique_id():
@@ -65,3 +67,7 @@ def convert_string_to_date(date_str, format_str):
         return None
 
     return datetime.strptime(date_str, format_str).date()
+
+
+def random_otp_generator():
+    return str(randint(1, 10)) + str(randrange(1000, 9999))

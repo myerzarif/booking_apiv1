@@ -13,7 +13,9 @@ from .views import (
     ResetPasswordView,
     EmailVerificationView,
     UserInfoView,
-    GetPasswordTokenView
+    GetPasswordTokenView,
+    OtpLoginView,
+    OtpVerifyView,
 )
 
 app_name = 'account'
@@ -29,6 +31,8 @@ urlpatterns = [
     path('user/password/send_token', SendResetPasswordTokenView.as_view(), name='send_reset_password_token'),
     path('user/password/reset', ResetPasswordView.as_view(), name='reset_password'),
     path('user/verify_email', EmailVerificationView.as_view(), name='verify_email'),
+    path('user/otp/login', OtpLoginView.as_view(), name='otp_login'),
+    path('user/otp/verify', OtpVerifyView.as_view(), name='otp_verify'),
 ]
 
 if settings.ENVIRONMENT_APP == 'DEVELOPE':

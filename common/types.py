@@ -16,6 +16,12 @@ class ContentTypes:
     XML = "application/xml"
 
 
+class UserType:
+    email = "email"
+    mobile = "mobile"
+    uuid = "uuid"
+
+
 @dataclass
 class Coordinates:
     longitude: float
