@@ -1,4 +1,4 @@
-from content.general.config import BaseConfig
+from content.base.config import BaseConfig
 from django.conf import settings
 from common.utils import get_current_time_in_second
 from common.utils import string_to_sha256hex

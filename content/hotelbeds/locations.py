@@ -1,8 +1,8 @@
 from .config import Config
 from common.extensions import mongo_default_db
-from content.general.models import DestinationData, CountryData, ZoneData, StateData
+from content.base.models import DestinationData, CountryData, ZoneData, StateData
 from common.decorators import check_null
-from content.general.locations import (
+from content.base.locations import (
     Countries,
     Destinations,
 )

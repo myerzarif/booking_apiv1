@@ -1,7 +1,7 @@
 from .config import Config
 from common.extensions import mongo_default_db
 from common.types import Coordinates, Address, Phone
-from content.general.models import HotelData, HotelRoomData
+from content.base.models import HotelData, HotelRoomData
 from .locations import HbDestinations
 from common.utils import convert_string_to_date
 from cache_memoize import cache_memoize
@@ -16,7 +16,7 @@ from .types import (
     HbFacilities,
     HbImageTypes
 )
-from content.general.hotels import (
+from content.base.hotels import (
     Hotels,
     HotelDetails,
 )

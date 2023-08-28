@@ -188,6 +188,13 @@ class ImageData:
 
 
 @dataclass
+class CurrencyData:
+    code: str
+    description: str
+    type: str
+
+
+@dataclass
 class HotelData:
     code: str
     name: str

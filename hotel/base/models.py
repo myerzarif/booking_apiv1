@@ -1,0 +1,97 @@
+from dataclasses import dataclass
+from typing import List
+from common.types import Coordinates, Address, Phone
+from datetime import date, ddatetime
+from content.base.models import HotelData, CurrencyData, RoomData, BoardData
+
+
+@dataclass
+class PaxData:
+    type: str
+    age: int
+
+
+@dataclass
+class OccupancyData:
+    rooms: int
+    adults: int
+    children: int
+    paxes: List[PaxData]
+
+
+@dataclass
+class AvailabilityQueryData:
+    destination: str
+    check_in: str
+    check_out: str
+    occupancies: List[OccupancyData]
+
+
+@dataclass
+class CancellationPlicyData:
+    amount: float
+    from: datetime
+
+
+@dataclass
+class TaxData:
+    included: bool,
+    amount: float,
+    currency: CurrencyData,
+    client_amount: float,
+    client_currency: CurrencyData
+
+
+@dataclass
+class AvailabilityTaxData:
+    taxes: List[TaxData]
+    all_included: bool
+
+
+@dataclass
+class OfferData:
+    code: str
+    name: str
+    amount: float
+
+
+@dataclass
+class RateData:
+    rate_key: str
+    rate_class: str
+    rate_type: str
+    rate_comments_id: str
+    net: float
+    allotment: float
+    payment_type: str
+    packaging: bool
+    board: BoardData
+    cancellation_policies: List[CancellationPlicyData]
+    tax_info: AvailabilityTaxData
+    rooms_count: int
+    adults_count: int
+    children_count: int
+    offers: List[OfferData]
+
+
+@dataclass
+class AvailableRoomData:
+    room: RoomData
+    rates: List[RateData]
+
+
+@dataclass
+class AvailableHotelData:
+    hotel: HotelData
+    rooms: List[AvailableRoomData]
+    min_rate: float
+    max_rate: float
+    currency: CurrencyData
+
+
+@dataclass
+class AvailabilityData:
+    check_in: str
+    check_out: str
+    total: int
+    hotels: List[AvailableHotelData]

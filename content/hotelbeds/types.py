@@ -2,7 +2,7 @@ from common.extensions import mongo_default_db
 from common.decorators import check_null
 from .config import Config
 from .locations import HbCountries
-from content.general.types import (
+from content.base.types import (
     Accommodations,
     Boards,
     Categories,
@@ -22,7 +22,7 @@ from content.general.types import (
     RateComments,
     RateCommentDetails
 )
-from content.general.models import (
+from content.base.models import (
     CategoryData,
     GroupCategoryData,
     ChainData,
@@ -40,7 +40,8 @@ from content.general.models import (
     HotelTerminalData,
     InterestPointData,
     ImageTypeData,
-    ImageData
+    ImageData,
+    CurrencyData
 )
 
 
@@ -129,6 +130,14 @@ class HbCurrencies(Currencies):
         self.config = Config(
             endpoint="/hotel-content-api/1.0/types/currencies")
         self.collection_name = self.get_collection_name()
+
+    @check_null()
+    def get_dataclass_by_doc(self, doc):
+        return CurrencyData(
+            code=doc.get("code"),
+            description=doc.get("description", {}).get("content"),
+            type=doc.get("currencyType")
+        )
 
 
 class HbFacilityGroups(FacilityGroups):
