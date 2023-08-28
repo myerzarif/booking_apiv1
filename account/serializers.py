@@ -395,6 +395,7 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
         self.request_otp = validated_data['otp']
         self.username, self.otp = self.get_username_and_otp()
         self.otp_validate()
+        
         if not self.username:
             raise exceptions.NotAcceptable(
                 "The token is expired! or the token is not valid")

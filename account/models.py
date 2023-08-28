@@ -34,26 +34,25 @@ class Role(BaseModel):
 class CustomUserManager(BaseUserManager):
     use_in_migrations = True
 
-    def _create_user(self, email, mobile, password, **extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         """
         Create and save a user with the given email, and password.
         """
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, mobile=mobile, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.active = True
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, mobile, password=None, **extra_fields):
-        return self._create_user(email, mobile, password, **extra_fields)
+    def create_user(self, email, password=None, **extra_fields):
+        return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, email, mobile, password=None, **extra_fields):
-        user = self._create_user(email, password, mobile, **extra_fields)
+    def create_superuser(self, email, password=None, **extra_fields):
+        user = self._create_user(email, password, **extra_fields)
         user.email_verified = True
-        user.mobile_verified = True
         user.status = User.UserStatus.ACTIVE
         user.role = User.UserRole.TECH
         user.save(using=self._db)
