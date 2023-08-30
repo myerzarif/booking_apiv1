@@ -1,44 +1,49 @@
 from dataclasses import dataclass
 from typing import List
 from common.types import Coordinates, Address, Phone
-from datetime import date, ddatetime
+from datetime import date, datetime
 from content.base.models import HotelData, CurrencyData, RoomData, BoardData
 
 
-@dataclass
-class PaxData:
-    type: str
-    age: int
+# @dataclass
+# class PaxData:
+#     type: str
+#     age: int
 
 
-@dataclass
-class OccupancyData:
-    rooms: int
-    adults: int
-    children: int
-    paxes: List[PaxData]
+# @dataclass
+# class OccupancyData:
+#     rooms: int
+#     adults: int
+#     children: int
+#     paxes: List[PaxData]
 
 
-@dataclass
-class AvailabilityQueryData:
-    destination: str
-    check_in: str
-    check_out: str
-    occupancies: List[OccupancyData]
+# @dataclass
+# class Stay:
+#     check_in: date
+#     check_out: date
+
+
+# @dataclass
+# class AvailabilityQueryData:
+#     stay: Stay
+#     destinations: List[str]
+#     occupancies: List[OccupancyData]
 
 
 @dataclass
 class CancellationPlicyData:
     amount: float
-    from: datetime
+    from_date: datetime
 
 
 @dataclass
 class TaxData:
-    included: bool,
-    amount: float,
-    currency: CurrencyData,
-    client_amount: float,
+    included: bool
+    amount: float
+    currency: CurrencyData
+    client_amount: float
     client_currency: CurrencyData
 
 
@@ -91,7 +96,7 @@ class AvailableHotelData:
 
 @dataclass
 class AvailabilityData:
-    check_in: str
-    check_out: str
+    check_in: date
+    check_out: date
     total: int
     hotels: List[AvailableHotelData]

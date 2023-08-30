@@ -12,6 +12,9 @@ import math
 from dataclasses import asdict
 from datetime import datetime
 from random import randint, randrange
+import logging
+
+logger = logging.getLogger('project.common')
 
 
 def generate_unique_id():
@@ -69,5 +72,23 @@ def convert_string_to_date(date_str, format_str):
     return datetime.strptime(date_str, format_str).date()
 
 
+def convert_string_to_datetime(datetime_str, format_str):
+    if not datetime_str:
+        return None
+
+    return datetime.strptime(datetime_str, format_str)
+
+
 def random_otp_generator():
     return str(randint(1, 10)) + str(randrange(1000, 9999))
+
+
+def to_float(value):
+    if not value:
+        return None
+
+    try:
+        return float(value)
+
+    except Exception as e:
+        logger.error("invalid float number: exception: {}".format(str(e)))

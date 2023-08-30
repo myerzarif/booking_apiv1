@@ -18,8 +18,8 @@ class HotelDetailView(LoggerMixin, generics.GenericAPIView):
     serializer_class = HotelContentSerializer
 
     @swagger_auto_schema(query_serializer=HotelContentQueryParamSerializer)
-    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='50/h', block=True))
-    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='5/m', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="GET", rate='50/h', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="GET", rate='5/m', block=True))
     def get(self, request, *args, **kwargs):
         """
         Get Hotel Info

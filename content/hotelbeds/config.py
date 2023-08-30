@@ -14,14 +14,14 @@ default_params = {"fields": "all",
 
 class Config(BaseConfig):
 
-    def __init__(self, endpoint, params=default_params, method=HttpMethods.GET, lastUpdateTime=None):
+    def __init__(self, endpoint, params=default_params, method=HttpMethods.GET, lastUpdateTime=None, data=None, json=None):
         self.supplier_name = "hotelbeds"
         self.base_url = settings.HOTELBEDS_BASE_URL
         self.endpoint = endpoint
         self.method = method
         self.params = params
-        self.data = None
-        self.json = None
+        self.data = data
+        self.json = json
         self.lastUpdateTime = lastUpdateTime
         self.headers = self.get_headers()
 

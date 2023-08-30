@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'file.apps.FileConfig',
     'common.apps.CommonConfig',
-    'content.apps.ContentConfig'
+    'content.apps.ContentConfig',
+    'hotel.apps.HotelConfig'
 ]
 
 MIDDLEWARE = [
@@ -64,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'config.exceptions.ExceptionMiddleware'
+    # 'config.exceptions.ExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'

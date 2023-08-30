@@ -4,6 +4,7 @@ from common.types import Coordinates, Address, Phone
 from content.base.models import HotelData, HotelRoomData
 from .locations import HbDestinations
 from common.utils import convert_string_to_date
+from rest_framework.exceptions import NotFound
 from cache_memoize import cache_memoize
 from .types import (
     HbCategories,
@@ -40,9 +41,11 @@ class HbHotels(Hotels):
     def convert_phones(self, phones):
         return [Phone(number=phone.get("phoneNumber"), type=phone.get("phoneType")) for phone in phones]
 
-    @cache_memoize(60*60*24, args_rewrite=lambda self, code, exclude: code + str(exclude))
     def get_by_code(self, code, exclude=[]):
         doc = self.get_doc_by_code(int(code))
+        if not doc:
+            raise NotFound("Hotel not found!")
+
         return HotelData(
             code=doc.get("code"),
             name=doc.get("name", {}).get("content"),

@@ -17,4 +17,4 @@ RUN pip install -r requirements.txt
 COPY . /api
 # RUN pipenv install --system
 
-CMD ["gunicorn", "--bind", ":5050", "config.wsgi:application"]
+CMD ["gunicorn", "--bind", ":5050", "config.wsgi:application", "--timeout", "60"]
