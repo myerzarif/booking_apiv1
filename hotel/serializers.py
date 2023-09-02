@@ -2,6 +2,7 @@
 from hotel.base.models import AvailabilityData
 from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
+from common.types import HOTEL_INFO_EXCLUDE_OPTIONS
 
 
 class PaxDataSerializer(serializers.Serializer):
@@ -26,6 +27,8 @@ class HotelAvailabilityQueryParamSerializer(serializers.Serializer):
     destinations = serializers.ListField(
         child=serializers.CharField(), required=False)
     occupancies = OccupancyDataSerializer(many=True)
+    exclude = serializers.ListField(
+        allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS))
 
 
 class HotelAvailabilitySerializer(DataclassSerializer):

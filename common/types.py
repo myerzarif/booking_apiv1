@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 
+HOTEL_INFO_EXCLUDE_OPTIONS = ['rooms', 'images', 'facilities', 'interest_points']
+
 class HttpMethods:
     GET = "GET"
     POST = 'POST'

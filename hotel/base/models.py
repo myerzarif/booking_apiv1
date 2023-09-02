@@ -67,6 +67,14 @@ class RateData:
     rate_type: str
     rate_comments_id: str
     net: float
+    selling_rate: float
+    hotel_selling_rate: float
+    hotel_currency: float
+    commission: float
+    commission_vat: float
+    commission_pct: float
+    total_rate: float
+    hotel_mandatory: bool
     allotment: float
     payment_type: str
     packaging: bool
@@ -82,7 +90,8 @@ class RateData:
 @dataclass
 class AvailableRoomData:
     room: RoomData
-    rates: List[RateData]
+    available_rates: List[RateData]
+    suggested_rate: RateData
 
 
 @dataclass

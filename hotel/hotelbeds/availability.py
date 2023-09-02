@@ -13,12 +13,13 @@ from content.hotelbeds.types import HbCurrencies, HbRooms, HbBoards
 from content.hotelbeds.hotels import HbHotels
 from common.decorators import check_null
 from common.types import HttpMethods
+from cache_memoize import cache_memoize
 
 
 class HbAvailability(Availability):
     # emirate_destinations = [ "AAN", "AE1", "AUH", "DXB", "FJR", "RKT", "SHJ", "UMM" ]
 
-    def __init__(self, filters=None):
+    def __init__(self, filters={}):
         self.config = Config(
             endpoint="/hotel-api/1.0/hotels",
             params=None,
@@ -26,6 +27,7 @@ class HbAvailability(Availability):
             data=None,
             method=HttpMethods.POST
         )
+        self.exclude = filters.get("exclude", [])
 
     def parse_occupancies(self, occupancy):
         result = {
@@ -54,7 +56,6 @@ class HbAvailability(Availability):
         if filters["destinations"]:
             params.update({"destinations": [{"code": code}
                           for code in filters["destinations"]]})
-        print("params", params)
         return params
 
     @check_null()
@@ -98,6 +99,16 @@ class HbAvailability(Availability):
                 rate_type=available_rate.get("rateType"),
                 rate_comments_id=available_rate.get("rateCommentsId"),
                 net=to_float(available_rate.get("net")),
+                selling_rate=to_float(available_rate.get("sellingRate")),
+                hotel_selling_rate=to_float(
+                    available_rate.get("hotelSellingRate")),
+                commission=to_float(available_rate.get("commission")),
+                commission_vat=to_float(available_rate.get("commissionVAT")),
+                commission_pct=to_float(available_rate.get("commissionPCT")),
+                hotel_mandatory=to_float(available_rate.get("hotelMandatory")),
+                hotel_currency=HbCurrencies().get_by_code(available_rate.get("hotelCurrency")),
+                total_rate=to_float(available_rate.get("sellingRate")) if available_rate.get(
+                    "sellingRate") else to_float(available_rate.get("net")),
                 allotment=to_float(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
@@ -119,14 +130,19 @@ class HbAvailability(Availability):
         ]
 
     @check_null()
+    def get_suggested_rate(self, available_rates):
+        return available_rates[0] if len(available_rates) > 0 else None
+
+    @check_null()
     def get_availablerooms_dataclasses(self, available_rooms):
-        return [
-            AvailableRoomData(
-                room=HbRooms().get_by_code(available_room.get("code")),
-                rates=self.get_availablerates_dataclasses(
-                    available_room.get("rates"))
-            ) for available_room in available_rooms
-        ]
+        for available_room in available_rooms:
+            room = HbRooms().get_by_code(available_room.get("code"))
+            available_rates = self.get_availablerates_dataclasses(
+                available_room.get("rates"))
+            suggested_rate = self.get_suggested_rate(available_rates)
+            return AvailableRoomData(room=room,
+                                     available_rates=available_rates,
+                                     suggested_rate=suggested_rate)
 
     @check_null()
     def get_availablehotels_dataclasses(self, available_hotels):
@@ -136,12 +152,13 @@ class HbAvailability(Availability):
                 max_rate=to_float(available_hotel.get("maxRate")),
                 currency=HbCurrencies().get_by_code(available_hotel.get("currency")),
                 hotel=HbHotels().get_by_code(
-                    available_hotel.get("code"), exclude=["rooms"]),
+                    available_hotel.get("code"), exclude=self.exclude),
                 rooms=self.get_availablerooms_dataclasses(
                     available_hotel.get("rooms")),
             ) for available_hotel in available_hotels
         ]
 
+    @cache_memoize(60*5, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
     def search(self):
         result = Availability.search(self)
         hotels = result.get("hotels", {})

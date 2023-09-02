@@ -4,6 +4,7 @@ from content.base.models import HotelData
 from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
 from typing import Literal, Optional
+from common.types import HOTEL_INFO_EXCLUDE_OPTIONS
 
 
 class HotelContentSerializer(DataclassSerializer):
@@ -17,5 +18,5 @@ class HotelContentSerializer(DataclassSerializer):
 
 
 class HotelContentQueryParamSerializer(serializers.Serializer):
-    exclude = serializers.ListField(allow_null=True, child=serializers.ChoiceField(
-        ['rooms', 'images', 'facilities', 'interest_points']))
+    exclude = serializers.ListField(
+        allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS))
