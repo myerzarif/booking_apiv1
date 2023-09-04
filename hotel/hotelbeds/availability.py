@@ -135,14 +135,16 @@ class HbAvailability(Availability):
 
     @check_null()
     def get_availablerooms_dataclasses(self, available_rooms):
+        rooms = []
         for available_room in available_rooms:
             room = HbRooms().get_by_code(available_room.get("code"))
             available_rates = self.get_availablerates_dataclasses(
                 available_room.get("rates"))
             suggested_rate = self.get_suggested_rate(available_rates)
-            return AvailableRoomData(room=room,
+            rooms.append(AvailableRoomData(room=room,
                                      available_rates=available_rates,
-                                     suggested_rate=suggested_rate)
+                                     suggested_rate=suggested_rate))
+        return rooms
 
     @check_null()
     def get_availablehotels_dataclasses(self, available_hotels):
