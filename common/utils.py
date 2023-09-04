@@ -92,3 +92,14 @@ def to_float(value):
 
     except Exception as e:
         logger.error("invalid float number: exception: {}".format(str(e)))
+
+
+def to_int(value):
+    if not value:
+        return None
+
+    try:
+        return int(value)
+
+    except Exception as e:
+        logger.error("invalid int number: exception: {}".format(str(e)))

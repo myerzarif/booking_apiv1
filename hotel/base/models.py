@@ -75,7 +75,7 @@ class RateData:
     commission_pct: float
     total_rate: float
     hotel_mandatory: bool
-    allotment: float
+    allotment: int
     payment_type: str
     packaging: bool
     board: BoardData

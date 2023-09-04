@@ -8,7 +8,7 @@ from hotel.base.models import (AvailabilityData,
                                AvailabilityTaxData,
                                TaxData,
                                OfferData)
-from common.utils import to_float, convert_string_to_date
+from common.utils import to_float, to_int, convert_string_to_date
 from content.hotelbeds.types import HbCurrencies, HbRooms, HbBoards
 from content.hotelbeds.hotels import HbHotels
 from common.decorators import check_null
@@ -109,7 +109,7 @@ class HbAvailability(Availability):
                 hotel_currency=HbCurrencies().get_by_code(available_rate.get("hotelCurrency")),
                 total_rate=to_float(available_rate.get("sellingRate")) if available_rate.get(
                     "sellingRate") else to_float(available_rate.get("net")),
-                allotment=to_float(available_rate.get("allotment")),
+                allotment=to_int(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
                 rooms_count=available_rate.get("rooms"),
