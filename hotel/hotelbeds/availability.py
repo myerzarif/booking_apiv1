@@ -160,7 +160,7 @@ class HbAvailability(Availability):
             ) for available_hotel in available_hotels
         ]
 
-    @cache_memoize(60*5, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
+    @cache_memoize(60*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
     def search(self):
         result = Availability.search(self)
         hotels = result.get("hotels", {})
