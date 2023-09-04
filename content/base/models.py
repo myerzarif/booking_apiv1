@@ -150,6 +150,11 @@ class DestinationData:
 
 
 @dataclass
+class DestinationListData:
+    List[DestinationData]
+
+
+@dataclass
 class TerminalData:
     code: str
     name: str

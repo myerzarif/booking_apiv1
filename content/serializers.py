@@ -1,6 +1,6 @@
 
 from django_restql.mixins import DynamicFieldsMixin
-from content.base.models import HotelData
+from content.base.models import HotelData, DestinationListData
 from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
 from typing import Literal, Optional
@@ -20,3 +20,12 @@ class HotelContentSerializer(DataclassSerializer):
 class HotelContentQueryParamSerializer(serializers.Serializer):
     exclude = serializers.ListField(
         allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS))
+
+
+class DestinationSerializer(DataclassSerializer):
+    """
+    Serializer for available Destinations
+    """
+
+    class Meta:
+        dataclass = DestinationListData

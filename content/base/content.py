@@ -4,7 +4,7 @@ from common.exceptions import ThirdPartyAPIFailure
 from common.decorators import check_null
 import logging
 from cache_memoize import cache_memoize
-
+import pymongo
 
 logger = logging.getLogger('project.content')
 
@@ -31,6 +31,11 @@ class Content():
         result = self.call_initial()
         col = self.collection_name
         mongo_default_db[col].insert_many(result.get(col, {}))
+
+    def create_index(self, _field, _type):
+        col = self.collection_name
+        mongo_default_db[col].create_index(
+            [(_field, _type)], name=f'{col}_{_field}_index')
 
     def get_full_url(self):
         return self.config.base_url + self.config.endpoint

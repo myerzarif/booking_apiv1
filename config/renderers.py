@@ -29,7 +29,7 @@ class ApiRenderer(JSONRenderer):
                 for field in data:
                     response_dict['errors'].append({'field_name': field, 'message': data[field][0]})
         elif type(data)==list:
-            response_dict['message'] = data[0]
+            # response_dict['message'] = data[0]
             response_dict['errors'] = []
 
         response_dict['success'] = False

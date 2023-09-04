@@ -1,7 +1,9 @@
 from .config import Config
 from common.extensions import mongo_default_db
-from content.base.models import DestinationData, CountryData, ZoneData, StateData
+from content.base.models import DestinationData, CountryData, ZoneData, StateData, DestinationListData
 from common.decorators import check_null
+from cache_memoize import cache_memoize
+from dataclasses import asdict
 from content.base.locations import (
     Countries,
     Destinations,
@@ -55,8 +57,17 @@ class HbDestinations(Destinations):
                 )
         return None
 
+    @check_null()
+    def get_dataclass_by_doc(self, doc):
+        return DestinationData(
+            code=doc.get("code"),
+            name=doc.get("name", {}).get("content"),
+            country=None,
+            zone=None
+        )
+
     @check_null(['doc'])
-    def get_dataclass_by_doc(self, doc, state_code, zone_code):
+    def get_dataclass_by_info(self, doc, state_code, zone_code):
         return DestinationData(
             code=doc.get("code"),
             name=doc.get("name", {}).get("content"),
@@ -66,4 +77,12 @@ class HbDestinations(Destinations):
 
     def get_by_destination_info(self, destination_code, state_code, zone_code):
         doc = self.get_doc_by_code(destination_code)
-        return self.get_dataclass_by_doc(doc, state_code, zone_code)
+        return self.get_dataclass_by_info(doc, state_code, zone_code)
+
+    @cache_memoize(60*60*24*7, args_rewrite=lambda self: f"available_{str(self.collection_name)}")
+    @check_null()
+    def get_available_destinations(self):
+        country_codes = ["AE"]
+        docs = list(mongo_default_db[self.collection_name].find(
+            {"countryCode": {'$in': country_codes}}))
+        return [asdict(self.get_dataclass_by_doc(doc)) for doc in docs]
