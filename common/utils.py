@@ -103,3 +103,18 @@ def to_int(value):
 
     except Exception as e:
         logger.error("invalid int number: exception: {}".format(str(e)))
+
+
+def generate_random_string(length=20):
+    random_source = string.ascii_letters + string.digits
+    password = random.choice(string.ascii_lowercase)
+    password += random.choice(string.ascii_uppercase)
+    password += random.choice(string.digits)
+
+    for i in range(length-3):
+        password += random.choice(random_source)
+
+    password_list = list(password)
+    random.SystemRandom().shuffle(password_list)
+    password = ''.join(password_list)
+    return password

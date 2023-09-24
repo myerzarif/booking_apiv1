@@ -39,3 +39,14 @@ class HotelAvailabilitySerializer(DataclassSerializer):
 
     class Meta:
         dataclass = AvailabilityData
+
+
+class HolderSerializer(serializers.Serializer):
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+
+
+class HotelBookingQueryParamSerializer(serializers.Serializer):
+    holder = HolderSerializer()
+    rate_key = serializers.CharField(required=True)
+    remark = serializers.CharField(required=False)
