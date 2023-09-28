@@ -53,9 +53,14 @@ class HbAvailability(Availability):
             },
             "occupancies": [self.parse_occupancies(occupancy) for occupancy in filters['occupancies']]
         }
-        if filters["destinations"]:
+
+        if filters.get("hotels"):
+            params.update(
+                {"hotels": {"hotel": [int(hotel) for hotel in filters["hotels"]]}})
+        elif filters.get("destinations"):
             params.update({"destinations": [{"code": code}
                           for code in filters["destinations"]]})
+
         return params
 
     @check_null()
@@ -142,8 +147,8 @@ class HbAvailability(Availability):
                 available_room.get("rates"))
             suggested_rate = self.get_suggested_rate(available_rates)
             rooms.append(AvailableRoomData(room=room,
-                                     available_rates=available_rates,
-                                     suggested_rate=suggested_rate))
+                                           available_rates=available_rates,
+                                           suggested_rate=suggested_rate))
         return rooms
 
     @check_null()
