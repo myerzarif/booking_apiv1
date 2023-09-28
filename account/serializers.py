@@ -425,10 +425,11 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
         if user_type == UserType.email:
             user.email = self.username
             user.email_verified = True
+            user.status = User.UserStatus.ACTIVE
         else:
             user.mobile = self.username
             user.mobile_verified = True
-        # user.status = User.UserStatus.ACTIVE
+            user.status = User.UserStatus.ACTIVE
         try:
             user.save()
             return user
