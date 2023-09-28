@@ -1,6 +1,6 @@
 from smtplib import SMTPException
 import email.utils
-import smtplib
+import smtplib, ssl
 from django.conf import settings
 from django.template.loader import get_template
 from email.mime.multipart import MIMEMultipart
@@ -72,13 +72,18 @@ def send_email(*args, **kwargs):
         tos = to.split(',')
         ccs = cc.split(',')
         bccs = bcc.split(',')
-        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as smtp_server:
-            smtp_server.connect(settings.EMAIL_HOST, settings.EMAIL_PORT)
-            smtp_server.ehlo()
-            smtp_server.starttls()
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(settings.EMAIL_HOST, settings.EMAIL_PORT, context=context) as smtp_server:
             smtp_server.login(settings.EMAIL_USERNAME, settings.EMAIL_PASSWORD)
             smtp_server.sendmail(settings.EMAIL_USERNAME, tos + ccs + bccs, msg_root.as_string())
-            smtp_server.quit()
+
+        # with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as smtp_server:
+        #     smtp_server.connect(settings.EMAIL_HOST, settings.EMAIL_PORT)
+        #     smtp_server.ehlo()
+        #     smtp_server.starttls()
+        #     smtp_server.login(settings.EMAIL_USERNAME, settings.EMAIL_PASSWORD)
+        #     smtp_server.sendmail(settings.EMAIL_USERNAME, tos + ccs + bccs, msg_root.as_string())
+        #     smtp_server.quit()
     except SMTPException as e:
         logger.error('Error: unable to send email to: {}'.format(to + ', ' + cc + ', ' + bcc), extra={
                     'error': str(e),

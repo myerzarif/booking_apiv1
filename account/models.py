@@ -70,6 +70,7 @@ class User(AbstractBaseUser):
         TECH = 'Tech', gettext_lazy('TECH')
         ADMIN = 'Admin', gettext_lazy('ADMIN')
         STAFF = 'Staff', gettext_lazy('STAFF')
+        DEFAULT = 'Default', gettext_lazy('DEFAULT')
 
     class UserStatus(models.TextChoices):
         # Actual value ↓      # ↓ Displayed on Django Admin
@@ -94,7 +95,7 @@ class User(AbstractBaseUser):
     role = models.CharField(
         max_length=15,
         choices=UserRole.choices,
-        default=UserRole.STAFF,
+        default=UserRole.DEFAULT,
     )
     status = models.CharField(
         max_length=15,
