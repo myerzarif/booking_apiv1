@@ -1,6 +1,6 @@
 
 from django_restql.mixins import DynamicFieldsMixin
-from content.base.models import HotelData, DestinationListData
+from content.base.models import HotelData, DestinationListData, StaticCountryListData
 from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
 from typing import Literal, Optional
@@ -29,3 +29,12 @@ class DestinationSerializer(DataclassSerializer):
 
     class Meta:
         dataclass = DestinationListData
+
+
+class StaticCountrySerializer(DataclassSerializer):
+    """
+    Serializer for static Countries
+    """
+
+    class Meta:
+        dataclass = StaticCountryListData

@@ -155,6 +155,19 @@ class DestinationListData:
 
 
 @dataclass
+class StaticCountryData:
+    code: str
+    name: str
+    prefix: str
+    flag: str
+
+
+@dataclass
+class StaticCountryListData:
+    List[StaticCountryData]
+
+
+@dataclass
 class TerminalData:
     code: str
     name: str
