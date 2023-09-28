@@ -343,7 +343,7 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
             raise exceptions.ValidationError('username type is not valid!')
 
         otp_str = random_otp_generator()
-        message_text = "This is your OTP on Alkhadra. Please don''t share with anyone else."
+        message_text = "This is your OTP on Alkhadra. Please don't share with anyone else."
         if user_type == UserType.email:
             send_email_celery(
                 subject="One Time Password",
