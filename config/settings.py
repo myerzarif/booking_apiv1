@@ -385,3 +385,6 @@ HOTELBEDS_SECRET = os.environ.get("HOTELBEDS_SECRET", "e8be986f34")
 STRIPE_PUBLISHABLE_KEY=os.environ.get("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_BASE_URL=os.environ.get("STRIPE_BASE_URL")
+
+REDIS_HOST = os.environ.get('REDIS_HOST', 'redis')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
