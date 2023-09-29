@@ -16,6 +16,7 @@ from .views import (
     GetPasswordTokenView,
     OtpLoginView,
     OtpVerifyView,
+    OtpResendView
 )
 
 app_name = 'account'
@@ -27,13 +28,17 @@ urlpatterns = [
     path('user/get_info', UserInfoView.as_view(), name='user_info'),
     path('user/<str:pk>', UserDetailView.as_view(), name='user'),
     path('user', UserView.as_view(), name='user'),
-    path('user/password/change', ChangePasswordView.as_view(), name='change_password'),
-    path('user/password/send_token', SendResetPasswordTokenView.as_view(), name='send_reset_password_token'),
+    path('user/password/change', ChangePasswordView.as_view(),
+         name='change_password'),
+    path('user/password/send_token', SendResetPasswordTokenView.as_view(),
+         name='send_reset_password_token'),
     path('user/password/reset', ResetPasswordView.as_view(), name='reset_password'),
     path('user/verify_email', EmailVerificationView.as_view(), name='verify_email'),
     path('user/otp/login', OtpLoginView.as_view(), name='otp_login'),
     path('user/otp/verify', OtpVerifyView.as_view(), name='otp_verify'),
+    path('user/otp/resend', OtpResendView.as_view(), name='otp_resend'),
 ]
 
 if settings.ENVIRONMENT_APP == 'DEVELOPE':
-    urlpatterns.append(path('user/password/get_token', GetPasswordTokenView.as_view(), name='get_password_token'))
+    urlpatterns.append(path('user/password/get_token',
+                       GetPasswordTokenView.as_view(), name='get_password_token'))

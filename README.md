@@ -96,3 +96,7 @@ mongo mongodb://bookingusr:B016eJ9Gej8@localhost:27018/
 mongodump --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookingdb --authenticationDatabase=admin --out 2023-08-17
 
 mongorestore --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookingdb --authenticationDatabase=admin --drop bookingdb/
+
+
+## stripe test card
+<!-- 4242424242424242 -->

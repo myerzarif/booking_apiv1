@@ -21,6 +21,7 @@ from django.utils.http import base36_to_int, int_to_base36
 from django.utils.crypto import constant_time_compare, salted_hmac
 from common.types import UserType
 from django.core.cache import cache
+from config.settings import REDIS_HOST, REDIS_PORT
 import redis
 import random
 import logging
@@ -363,6 +364,28 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
         cache.set(f"otp_token_{token}", username, 120)
         return token
 
+    def resend_otp(self):
+        validated_data = self.validated_data
+        username = validated_data["username"]
+        user_type = username_type(username)
+
+        if user_type not in ["email", "phone"]:
+            raise exceptions.ValidationError('username type is not valid!')
+
+        r = redis.StrictRedis(
+            host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+        if not r.exists("otp_"+username):
+            return self.send_otp()
+        # otp sent before
+        remain_seconds = r.ttl("otp_"+username)
+        if remain_seconds < 10:
+            # remove token and otp from redis
+            r.persist("otp_" + username)
+            return self.send_otp()
+        else:
+            raise exceptions.ValidationError(
+                'Please wait for a few seconds to send a new otp!')
+
 
 class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
     token = serializers.CharField(write_only=True)
@@ -395,7 +418,7 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
         self.request_otp = validated_data['otp']
         self.username, self.otp = self.get_username_and_otp()
         self.otp_validate()
-        
+
         if not self.username:
             raise exceptions.NotAcceptable(
                 "The token is expired! or the token is not valid")

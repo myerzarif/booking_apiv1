@@ -119,7 +119,7 @@ class LogoutView(LoggerMixin, generics.GenericAPIView):
 class UserInfoView(LoggerMixin, generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = Serializer
-    
+
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(data=serializer.data, status=200)
@@ -294,3 +294,29 @@ class OtpVerifyView(LoggerMixin, generics.GenericAPIView):
         data = AccessTokenSerializer(instance=token, context={
                                      'request': request}).data
         return Response(data=data, status=200)
+
+
+class OtpResendView(LoggerMixin, generics.GenericAPIView):
+    """
+    OTP Resend 
+    """
+    serializer_class = OtpLoginSerializer
+    permission_classes = []
+
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='2/s', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='20/m', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='50/h', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='2/m', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='8/h', block=True))
+    @method_decorator(ratelimit(key='post:username', method="POST", rate='20/d', block=True))
+    def post(self, request):
+        """Post Method View"""
+        self.data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.resend_otp()
+
+        data = {'detail': 'OTP sent successfully!', 'token': token}
+
+        return Response(data=data, status=status.HTTP_201_CREATED)

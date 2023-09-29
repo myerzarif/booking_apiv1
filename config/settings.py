@@ -380,3 +380,8 @@ HOTELBEDS_BASE_URL = os.environ.get(
 HOTELBEDS_API_KEY = os.environ.get(
     "HOTELBEDS_API_KEY", "70ee9c04c862f43c76bec6dff2e6a265")
 HOTELBEDS_SECRET = os.environ.get("HOTELBEDS_SECRET", "e8be986f34")
+
+# Stripe Payment Gateway
+STRIPE_PUBLISHABLE_KEY=os.environ.get("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY")
+STRIPE_BASE_URL=os.environ.get("STRIPE_BASE_URL")

@@ -39,3 +39,4 @@ xmltodict==0.13.0
 django-cache-memoize==0.1.10
 pymongo==4.4.1
 djangorestframework-dataclasses==1.2.0
+stripe==6.6.0
