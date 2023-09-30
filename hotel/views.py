@@ -27,6 +27,23 @@ class HotelAvailabilityView(LoggerMixin, generics.GenericAPIView):
         availabilities = HbAvailability(filters=filters).search()
         return Response(data=asdict(availabilities), status=200)
 
+class HotelAvailabilityV2View(LoggerMixin, generics.GenericAPIView):
+    """
+    Check Hotel Availability V2
+    """
+    permission_classes = []
+    serializer_class = HotelAvailabilityQueryParamSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Search Hotels
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        filters = serializer.validated_data
+        availabilities = HbAvailability(filters=filters).search_v2()
+        return Response(data=asdict(availabilities), status=200)
+
 
 class HotelBookingView(LoggerMixin, generics.GenericAPIView):
     """

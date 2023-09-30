@@ -14,6 +14,7 @@ from content.hotelbeds.hotels import HbHotels
 from common.decorators import check_null
 from common.types import HttpMethods
 from cache_memoize import cache_memoize
+from common.utils import string_to_sha256hex
 
 
 class HbAvailability(Availability):
@@ -176,3 +177,7 @@ class HbAvailability(Availability):
             hotels=self.get_availablehotels_dataclasses(
                 hotels.get("hotels", []))
         )
+    
+    @cache_memoize(60*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
+    def search_v2(self):
+        hashId = string_to_sha256hex(str(self.config.json))
