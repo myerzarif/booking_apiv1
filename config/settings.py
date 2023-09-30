@@ -382,9 +382,12 @@ HOTELBEDS_API_KEY = os.environ.get(
 HOTELBEDS_SECRET = os.environ.get("HOTELBEDS_SECRET", "e8be986f34")
 
 # Stripe Payment Gateway
-STRIPE_PUBLISHABLE_KEY=os.environ.get("STRIPE_PUBLISHABLE_KEY")
-STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY")
-STRIPE_BASE_URL=os.environ.get("STRIPE_BASE_URL")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+STRIPE_BASE_URL = os.environ.get("STRIPE_BASE_URL")
 
 REDIS_HOST = os.environ.get('REDIS_HOST', 'booking_redis')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
+
+HOTEL_FEE_PERCENTAGE = os.environ.get('HOTEL_FEE_PERCENTAGE', 0)
+CAR_FEE_PERCENTAGE = int(os.environ.get('CAR_FEE_PERCENTAGE', 0))

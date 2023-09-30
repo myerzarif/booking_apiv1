@@ -414,18 +414,28 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
 
     def token_validate(self):
         validated_data = self.validated_data
-        self.token = validated_data['token']
-        self.request_otp = validated_data['otp']
-        self.username, self.otp = self.get_username_and_otp()
-        self.otp_validate()
-
-        if not self.username:
-            raise exceptions.NotAcceptable(
-                "The token is expired! or the token is not valid")
-        if not self.otp:
-            raise exceptions.NotAcceptable(
-                "The otp is expired! please try again.")
-
+        token = validated_data["token"]
+        request_otp = validated_data["otp"]
+ 
+        r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+       
+        username, otp = self.get_username_and_otp(token, r)
+        
+        if not username:
+            raise exceptions.NotAcceptable("The token is expired! or the token is not valid")
+        if not otp:
+            raise exceptions.NotAcceptable("The otp is expired! please try again.")
+        if not(otp == request_otp or (settings.ENVIRONMENT_APP != 'PRODUCTION' and request_otp == '11111')):
+            attempts = "1"
+            if r.exists("otp_attempt_"+ otp + username):
+                attempts = r.get("otp_attempt_"+ otp + username)
+            if attempts == "3":
+                raise exceptions.NotAcceptable("Too many wrong attempts. please try later!")
+            
+            r.set("otp_attempt_"+ otp + username, str(int(attempts)+1))
+            r.expire("otp_attempt_"+ otp + username , 120)
+            raise exceptions.NotAcceptable("The otp is not correct")
+        
         user_type = username_type(self.username)
 
         if user_type == UserType.email:
