@@ -1,4 +1,5 @@
 from time import sleep
+from common.extensions import mongo_default_db
 import pymongo
 from .locations import (
     HbCountries,
@@ -59,7 +60,7 @@ def initial_type_insert(_from=None, _to=None):
         sleep(1)
 
 
-def initial_code_index():
+def initial_indexes():
     hb_classes = [
         HbChains,
         HbDestinations,
@@ -73,6 +74,9 @@ def initial_code_index():
         instance = cls()
         instance.create_index('code', pymongo.ASCENDING)
         print("index created on code for collection", instance)
+
+    # create TTL index for search collection
+    mongo_default_db["search_info"].create_index("expiry_date", expireAfterSeconds=0)
 
 
 def initial_location_insert(_from=None, _to=None):

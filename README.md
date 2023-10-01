@@ -100,3 +100,9 @@ mongorestore --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookin
 
 ## stripe test card
 <!-- 4242424242424242 -->
+
+
+## indexes
+We should run content.hotelbed.commands --> initial_indexes
+db.search_info.createIndex( { "expiry_date": 1 }, { expireAfterSeconds: 0 })
+

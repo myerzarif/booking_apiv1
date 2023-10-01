@@ -7,7 +7,11 @@ from hotel.base.models import (AvailabilityData,
                                CancellationPlicyData,
                                AvailabilityTaxData,
                                TaxData,
-                               OfferData)
+                               OfferData,
+                               SuggestedHotelInfo,
+                               ResponseHotel,
+                               SuggestedRoomInfo,
+                               SuggestedRateInfo)
 from common.utils import to_float, to_int, convert_string_to_date
 from content.hotelbeds.types import HbCurrencies, HbRooms, HbBoards
 from content.hotelbeds.hotels import HbHotels
@@ -15,6 +19,12 @@ from common.decorators import check_null
 from common.types import HttpMethods
 from cache_memoize import cache_memoize
 from common.utils import string_to_sha256hex
+from dataclasses import asdict
+from common.utils import generate_unique_id, dataclass_to_doc
+from typing import List
+from common.extensions import mongo_default_db
+from datetime import datetime, timedelta
+from django.conf import settings
 
 
 class HbAvailability(Availability):
@@ -167,7 +177,7 @@ class HbAvailability(Availability):
         ]
 
     @cache_memoize(60*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
-    def search(self):
+    def remote_search(self):
         result = Availability.search(self)
         hotels = result.get("hotels", {})
         return AvailabilityData(
@@ -177,7 +187,87 @@ class HbAvailability(Availability):
             hotels=self.get_availablehotels_dataclasses(
                 hotels.get("hotels", []))
         )
-    
-    @cache_memoize(60*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
+
+    def suggested_room(self, rooms: List[AvailableRoomData]):
+        if not rooms:
+            return None
+
+        return SuggestedRoomInfo(
+            code=rooms[0].room.code,
+            description=rooms[0].room.description
+        )
+
+    def suggested_rate(self, rooms: List[AvailableRoomData]):
+        if not rooms:
+            return None
+
+        return SuggestedRoomInfo(
+            code=rooms[0].suggested_rate.rate_key,
+            description=rooms[0].suggested_rate.total_rate
+        )
+
+    def seggested_item(self, search_id, hotel: AvailableHotelData):
+        return SuggestedHotelInfo(
+            search_id=search_id,
+            item_id=generate_unique_id(),
+            hotel=ResponseHotel(code=hotel.hotel.code,
+                                name=hotel.hotel.name,
+                                description=hotel.hotel.description,
+                                destination=hotel.hotel.destination,
+                                coordinates=hotel.hotel.coordinates,
+                                images=hotel.hotel.images,
+                                S2C=hotel.hotel.S2C
+                                ),
+            room=self.suggested_room(hotel.rooms),
+            rate=self.suggested_rate(hotel.rooms),
+            min_rate=hotel.min_rate,
+            max_rate=hotel.max_rate,
+            currency=hotel.currency,
+            total_room=len(hotel.rooms)
+        )
+
+    def cache_availability_result(self, data: AvailabilityData, search_id):
+        if not data.hotels:
+            return []
+
+        search_response = []
+
+        for hotel in data.hotels:
+            item = self.seggested_item(search_id, hotel)
+            mongo_item = asdict(item)
+            mongo_item["info"] = dataclass_to_doc(hotel)
+            mongo_item["expiry_date"] = datetime.utcnow(
+            ) + timedelta(hours=settings.MONGO_SEARCH_CACHE)
+            mongo_default_db["search_info"].insert_one(mongo_item)
+            search_response.append(item)
+
+        return search_response
+
+    def get_data_from_mongo(self, search_id):
+        result = list(mongo_default_db["search_info"].find(
+            {"search_id": search_id}, {"info": 0, "expiry_date": 0, "_id": 0}))
+
+        if not result:
+            return {}
+
+        return {
+            "hotels": result,
+            "total": len(result)
+        }
+
+    @cache_memoize(10*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
     def search_v2(self):
-        hashId = string_to_sha256hex(str(self.config.json))
+        search_id = string_to_sha256hex(str(self.config.json))
+
+        # This will return the list of hotels in the chache based on searched id
+        result = self.get_data_from_mongo(search_id)
+
+        # If the cache is invalidated or the search is new we will query the hotel Supplier and update our cache
+        if not result:
+            response_data = self.remote_search()
+            search_response = self.cache_availability_result(
+                response_data, search_id)
+            result["hotels"] = [asdict(item) for item in search_response]
+            result["total"] = len(search_response)
+
+        return result

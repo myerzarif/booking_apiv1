@@ -13,6 +13,7 @@ from dataclasses import asdict
 from datetime import datetime
 from random import randint, randrange
 import logging
+from datetime import date
 
 logger = logging.getLogger('project.common')
 
@@ -57,12 +58,19 @@ def string_to_sha256hex(text):
     return sha256.hexdigest()
 
 
-def dataclass_to_json(instance):
+def datetime_encoder(obj):
+    if isinstance(obj, date):
+        return obj.isoformat()
+
+
+def dataclass_to_doc(instance):
     # Convert the data class instance to a dictionary
     data_dict = asdict(instance)
 
+    json_data = json.dumps(data_dict, default=datetime_encoder)
+
     # Convert the dictionary to JSON
-    return json.dumps(data_dict)
+    return json.loads(json_data)
 
 
 def convert_string_to_date(date_str, format_str):

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from common.types import Coordinates, Address, Phone
 from datetime import date, datetime
-from content.base.models import HotelData, CurrencyData, RoomData, BoardData
+from content.base.models import HotelData, CurrencyData, RoomData, BoardData, DestinationData, ImageData
 
 
 # @dataclass
@@ -109,3 +109,39 @@ class AvailabilityData:
     check_out: date
     total: int
     hotels: List[AvailableHotelData]
+
+
+@dataclass
+class ResponseHotel:
+    code: int
+    name: str
+    description: str
+    destination: DestinationData
+    coordinates: Coordinates
+    images: List[ImageData]
+    S2C: str
+
+
+@dataclass
+class SuggestedRoomInfo:
+    code: int
+    description: str
+
+
+@dataclass
+class SuggestedRateInfo:
+    rate_ky: str
+    total_rate: float
+
+
+@dataclass
+class SuggestedHotelInfo:
+    item_id: str
+    search_id: str
+    hotel: ResponseHotel
+    room: SuggestedRoomInfo
+    rate: SuggestedRateInfo
+    min_rate: float
+    max_rate: float
+    currency: CurrencyData
+    total_room: int

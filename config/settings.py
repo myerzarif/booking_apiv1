@@ -114,6 +114,7 @@ MONGO_DB_SETTING = {
         'authMechanism': 'SCRAM-SHA-1'
     },
 }
+MONGO_SEARCH_CACHE = int(os.environ.get("MONGO_SEARCH_CACHE", 24))
 
 # Mongo
 # MONGO_DB_SETTING = {

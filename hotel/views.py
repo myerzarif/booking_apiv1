@@ -24,7 +24,7 @@ class HotelAvailabilityView(LoggerMixin, generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         filters = serializer.validated_data
-        availabilities = HbAvailability(filters=filters).search()
+        availabilities = HbAvailability(filters=filters).remote_search()
         return Response(data=asdict(availabilities), status=200)
 
 class HotelAvailabilityV2View(LoggerMixin, generics.GenericAPIView):
@@ -42,7 +42,7 @@ class HotelAvailabilityV2View(LoggerMixin, generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         filters = serializer.validated_data
         availabilities = HbAvailability(filters=filters).search_v2()
-        return Response(data=asdict(availabilities), status=200)
+        return Response(data=availabilities, status=200)
 
 
 class HotelBookingView(LoggerMixin, generics.GenericAPIView):
