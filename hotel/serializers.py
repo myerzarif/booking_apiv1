@@ -27,9 +27,10 @@ class HotelAvailabilityQueryParamSerializer(serializers.Serializer):
     destinations = serializers.ListField(
         child=serializers.CharField(), required=False)
     occupancies = OccupancyDataSerializer(many=True)
-    hotels = serializers.ListField(child=serializers.CharField(), required=False)
+    hotels = serializers.ListField(
+        child=serializers.CharField(), required=False)
     exclude = serializers.ListField(
-        allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS))
+        allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS), required=False)
 
 
 class HotelAvailabilitySerializer(DataclassSerializer):
