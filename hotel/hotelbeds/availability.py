@@ -203,7 +203,7 @@ class HbAvailability(Availability):
 
         return SuggestedRoomInfo(
             code=rooms[0].suggested_rate.rate_key,
-            description=rooms[0].suggested_rate.total_rate
+            total_rate=rooms[0].suggested_rate.total_rate
         )
 
     def seggested_item(self, search_id, hotel: AvailableHotelData):
