@@ -130,7 +130,7 @@ class SuggestedRoomInfo:
 
 @dataclass
 class SuggestedRateInfo:
-    rate_ky: str
+    rate_key: str
     total_rate: float
 
 

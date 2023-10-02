@@ -201,8 +201,8 @@ class HbAvailability(Availability):
         if not rooms:
             return None
 
-        return SuggestedRoomInfo(
-            code=rooms[0].suggested_rate.rate_key,
+        return SuggestedRateInfo(
+            rate_key=rooms[0].suggested_rate.rate_key,
             total_rate=rooms[0].suggested_rate.total_rate
         )
 
