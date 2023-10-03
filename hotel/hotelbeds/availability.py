@@ -110,7 +110,8 @@ class HbAvailability(Availability):
     def get_availablerates_dataclasses(self, available_rates):
         def get_hotel_rate(available_rate):
             return to_float(available_rate.get("sellingRate")) if available_rate.get(
-                "sellingRate") else to_float(available_rate.get("net")),
+                "sellingRate") else to_float(available_rate.get("net"))
+                
         return [
             RateData(
                 rate_key=available_rate.get("rateKey"),
@@ -127,7 +128,7 @@ class HbAvailability(Availability):
                 hotel_mandatory=to_float(available_rate.get("hotelMandatory")),
                 hotel_currency=HbCurrencies().get_by_code(available_rate.get("hotelCurrency")),
                 hotel_rate=get_hotel_rate(available_rate),
-                total_rate=to_decimal(get_hotel_rate(available_rate) * settings.HOTEL_FEE_PERCENTAGE),
+                total_rate=to_decimal(get_hotel_rate(available_rate) * (settings.HOTEL_FEE_PERCENTAGE)/100),
                 allotment=to_int(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
