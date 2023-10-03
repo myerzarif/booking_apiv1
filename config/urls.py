@@ -8,6 +8,7 @@ from file import urls as FILE_URL
 from content import urls as CONTENT_URL
 from hotel import urls as HOTEL_URL
 from car import urls as CAR_URL
+from transaction import urls as TRANSACTION_URL
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
@@ -30,6 +31,7 @@ urlpatterns = [
     path('api/v1/content/', include(CONTENT_URL)),
     path('api/v1/hotel/', include(HOTEL_URL)),
     path('api/v1/car/', include(CAR_URL)),
+    path('api/v1/transaction/', include(TRANSACTION_URL)),
 ]
 
 if settings.DEBUG or settings.ENVIRONMENT_APP != "PRODUCTION":

@@ -56,9 +56,6 @@ class CarView(LoggerMixin, generics.GenericAPIView):
         # serializer = self.serializer_class(data=request.data)
         # serializer.is_valid(raise_exception=True)
         # filters = serializer.validated_data
-        print("request.query_params", request.query_params)
-        print("dir(request.query_params)", dir(request.query_params))
-        print("request.query_params.dict()", request.query_params.dict())
         
         cars = HbRental(params=request.query_params.dict()).search()
         return Response(data=cars, status=200)

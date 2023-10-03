@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'content.apps.ContentConfig',
     'hotel.apps.HotelConfig',
-    'car.apps.CarConfig'
+    'car.apps.CarConfig',
+    'transaction.apps.TransactionConfig'
 ]
 
 MIDDLEWARE = [
