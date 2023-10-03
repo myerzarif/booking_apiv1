@@ -448,17 +448,17 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
             r.expire("otp_attempt_" + otp + username, 120)
             raise exceptions.NotAcceptable("The otp is not correct")
 
-        user_type = username_type(self.username)
+        user_type = username_type(username)
 
         if user_type == UserType.email:
-            users = User.objects.filter(email=self.username)
+            users = User.objects.filter(email=username)
             if users:
                 u = users[0]
                 u.email_verified = True
                 u.save()
                 return u
         elif user_type == UserType.mobile:
-            users = User.objects.filter(mobile=self.username)
+            users = User.objects.filter(mobile=username)
             if users:
                 u = users[0]
                 u.mobile_verified = True
@@ -468,11 +468,11 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
         # create user if needed and return it
         user = User()
         if user_type == UserType.email:
-            user.email = self.username
+            user.email = username
             user.email_verified = True
             user.status = User.UserStatus.ACTIVE
         else:
-            user.mobile = self.username
+            user.mobile = username
             user.mobile_verified = True
             user.status = User.UserStatus.ACTIVE
         try:
