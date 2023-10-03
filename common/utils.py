@@ -139,3 +139,6 @@ def generate_random_string(length=20):
     random.SystemRandom().shuffle(password_list)
     password = ''.join(password_list)
     return password
+
+def get_total_amount(amount, percentage):
+    return to_decimal(float(amount) + (float(amount) * percentage/100))
