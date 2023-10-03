@@ -328,9 +328,10 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
         dt = datetime.now()
         timestamp = int((dt - datetime(2001, 1, 1)).total_seconds())
         ts_b36 = int_to_base36(timestamp)
+        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
         hash_string = salted_hmac(
-            key_salt="django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash",
-            value=username + str(timestamp),
+            key_salt,
+            username + str(timestamp),
             algorithm='sha1',
         ).hexdigest()
         return "%s-%s" % (ts_b36, hash_string)
@@ -340,28 +341,43 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
         username = validated_data["username"]
         user_type = username_type(username)
 
-        if user_type not in [UserType.mobile, UserType.email]:
+        if user_type not in ["email", "phone"]:
             raise exceptions.ValidationError('username type is not valid!')
 
+        r = redis.StrictRedis(
+            host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+
         otp_str = random_otp_generator()
-        message_text = "This is your OTP on Alkhadra. Please don't share with anyone else."
-        if user_type == UserType.email:
-            send_email_celery(
-                subject="One Time Password",
-                to=username,
-                title="Dear {0}".format(username),
-                start_lines=[message_text, 'OTP: {0}'.format(otp_str), ''],
-                links=[],
-                cc=''
-            )
-        elif user_type == UserType.mobile:
-            send_sms_celery(
-                msisdn=username,
-                body='{0}\nOTP: {1}'.format(message_text, otp_str),
-            )
+
+        try:
+            if user_type == 'email':
+                send_email_celery(
+                    subject="One Time Password",
+                    to=username,
+                    title="Dear {0}".format(username),
+                    start_lines=['This is your OTP on OpenPenny. Please don''t share with anyone else.',
+                                 'OTP: {0}'.format(otp_str), ''],
+                    links=[],
+                    cc=''
+                )
+            elif user_type == 'phone':
+                send_sms_celery(
+                    msisdn=username,
+                    body='This is your OTP on OpenPenny. Please don''t share with anyone else.\nOTP: {0}'.format(
+                        otp_str),
+                )
+        except Exception as e:
+            raise exceptions.ErrorDetail(
+                "Something went wrong: {0}".format(str(e)))
+
         token = self.generate_token(username)
-        cache.set(f"otp_{username}", otp_str, 120)
-        cache.set(f"otp_token_{token}", username, 120)
+
+        r.set("otp_"+username, otp_str)
+        r.expire("otp_"+username, 120)
+
+        r.set("otp_token_"+token, username)
+        r.expire("otp_token_"+token, 120)
+
         return token
 
     def resend_otp(self):
@@ -378,13 +394,13 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
             return self.send_otp()
         # otp sent before
         remain_seconds = r.ttl("otp_"+username)
-        if remain_seconds < 10:
+        if remain_seconds < 60:
             # remove token and otp from redis
-            r.persist("otp_" + username)
+            r.persist("otp_"+username)
             return self.send_otp()
         else:
             raise exceptions.ValidationError(
-                'Please wait for a few seconds to send a new otp!')
+                'please wait a minute to send otp again!')
 
 
 class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
@@ -402,22 +418,6 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
             return username, None
         return None, None
 
-    def otp_validate(self):
-        if settings.ENVIRONMENT_APP is not 'PRODUCTION' and self.otp == '11111':
-            return
-
-        if self.otp == self.request_otp:
-            return
-
-        attempts = cache.get(f"otp_attempt_{self.otp}{self.username}") or "1"
-        if attempts == "3":
-            raise exceptions.NotAcceptable(
-                "Maximum wrong attempts are exceeded, please try later!")
-
-        cache.set(f"otp_attempt_{self.otp}{self.username}", str(
-            int(attempts)+1), 120)
-        raise exceptions.NotAcceptable("The otp is not correct")
-
     def token_validate(self):
         validated_data = self.validated_data
         token = validated_data["token"]
@@ -426,6 +426,8 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
         r = redis.StrictRedis(
             host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
+        # convert token to username
+        # check if username exists in redis
         username, otp = self.get_username_and_otp(token, r)
 
         if not username:
@@ -440,7 +442,7 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
                 attempts = r.get("otp_attempt_" + otp + username)
             if attempts == "3":
                 raise exceptions.NotAcceptable(
-                    "Too many wrong attempts. please try later!")
+                    "you input wrong otp for three times. please try later!")
 
             r.set("otp_attempt_" + otp + username, str(int(attempts)+1))
             r.expire("otp_attempt_" + otp + username, 120)
