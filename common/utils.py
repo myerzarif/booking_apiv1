@@ -88,7 +88,7 @@ def convert_string_to_datetime(datetime_str, format_str):
 
 
 def random_otp_generator():
-    return str(randint(1, 10)) + str(randrange(1000, 9999))
+    return str(randint(1, 9)) + str(randrange(1000, 9999))
 
 
 def to_float(value):

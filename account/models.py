@@ -79,8 +79,10 @@ class User(AbstractBaseUser):
         BLOCKED = 'Blocked', gettext_lazy('BLOCKED')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(max_length=200, blank=True, null=True, unique=True)
-    mobile = models.CharField(max_length=15, blank=True, null=True, unique=True)
+    email = models.EmailField(
+        max_length=200, blank=True, null=True, unique=True)
+    mobile = models.CharField(
+        max_length=15, blank=True, null=True, unique=True)
     job_title = models.CharField(max_length=200, blank=True, null=True)
     roles = models.ManyToManyField(Role, blank=True, related_name="role_users")
 
