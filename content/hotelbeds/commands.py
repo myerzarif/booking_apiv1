@@ -77,7 +77,8 @@ def initial_indexes():
 
     # create TTL index for search collection
     mongo_default_db["search_info"].create_index("expiry_date", expireAfterSeconds=0)
-
+    mongo_default_db["search_info"].create_index(("search_id", pymongo.ASCENDING))
+    mongo_default_db["search_info"].create_index(("item_id", pymongo.ASCENDING))
 
 def initial_location_insert(_from=None, _to=None):
     hb_classes = [HbCountries, HbDestinations]

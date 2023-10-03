@@ -226,6 +226,16 @@ class HbAvailability(Availability):
             total_room=len(hotel.rooms)
         )
 
+    def create_availability_response(self, hotels):
+        response = {
+            "hotels": hotels,
+            "total": len(hotels)
+        }
+        if not hotels:
+            response["message"] = "There is no available stay for this search! Please change the date or occupancy info and try again."
+
+        return response
+
     def cache_availability_result(self, data: AvailabilityData, search_id):
         if not data.hotels:
             return []
@@ -248,12 +258,9 @@ class HbAvailability(Availability):
             {"search_id": search_id}, {"info": 0, "expiry_date": 0, "_id": 0}))
 
         if not result:
-            return {}
+            return None
 
-        return {
-            "hotels": result,
-            "total": len(result)
-        }
+        return self.create_availability_response(result)
 
     @cache_memoize(10*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
     def search_v2(self):
@@ -267,7 +274,7 @@ class HbAvailability(Availability):
             response_data = self.remote_search()
             search_response = self.cache_availability_result(
                 response_data, search_id)
-            result["hotels"] = [asdict(item) for item in search_response]
-            result["total"] = len(search_response)
+            hotels = [asdict(item) for item in search_response]
+            result = self.create_availability_response(hotels)
 
         return result
