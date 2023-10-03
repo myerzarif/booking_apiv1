@@ -127,8 +127,7 @@ class HbAvailability(Availability):
                 hotel_mandatory=to_float(available_rate.get("hotelMandatory")),
                 hotel_currency=HbCurrencies().get_by_code(available_rate.get("hotelCurrency")),
                 hotel_rate=get_hotel_rate(available_rate),
-                total_rate=to_decimal(available_rate(
-                    available_rate) * settings.HOTEL_FEE_PERCENTAGE),
+                total_rate=to_decimal(get_hotel_rate(available_rate) * settings.HOTEL_FEE_PERCENTAGE),
                 allotment=to_int(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
