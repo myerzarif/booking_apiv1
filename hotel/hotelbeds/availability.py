@@ -12,7 +12,7 @@ from hotel.base.models import (AvailabilityData,
                                ResponseHotel,
                                SuggestedRoomInfo,
                                SuggestedRateInfo)
-from common.utils import to_float, to_int, convert_string_to_date
+from common.utils import to_float, to_int, convert_string_to_date, to_decimal
 from content.hotelbeds.types import HbCurrencies, HbRooms, HbBoards
 from content.hotelbeds.hotels import HbHotels
 from common.decorators import check_null
@@ -108,6 +108,9 @@ class HbAvailability(Availability):
 
     @check_null()
     def get_availablerates_dataclasses(self, available_rates):
+        def get_hotel_rate(available_rate):
+            return to_float(available_rate.get("sellingRate")) if available_rate.get(
+                "sellingRate") else to_float(available_rate.get("net")),
         return [
             RateData(
                 rate_key=available_rate.get("rateKey"),
@@ -123,8 +126,9 @@ class HbAvailability(Availability):
                 commission_pct=to_float(available_rate.get("commissionPCT")),
                 hotel_mandatory=to_float(available_rate.get("hotelMandatory")),
                 hotel_currency=HbCurrencies().get_by_code(available_rate.get("hotelCurrency")),
-                total_rate=to_float(available_rate.get("sellingRate")) if available_rate.get(
-                    "sellingRate") else to_float(available_rate.get("net")),
+                hotel_rate=get_hotel_rate(available_rate),
+                total_rate=to_decimal(available_rate(
+                    available_rate) * settings.HOTEL_FEE_PERCENTAGE),
                 allotment=to_int(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
@@ -203,7 +207,8 @@ class HbAvailability(Availability):
 
         return SuggestedRateInfo(
             rate_key=rooms[0].suggested_rate.rate_key,
-            total_rate=rooms[0].suggested_rate.total_rate
+            hotel_rate=rooms[0].suggested_rate.hotel_rate,
+            total_rate=rooms[0].suggested_rate.total_rate,
         )
 
     def seggested_item(self, search_id, hotel: AvailableHotelData):

@@ -74,6 +74,7 @@ class RateData:
     commission_vat: float
     commission_pct: float
     total_rate: float
+    hotel_rate: float
     hotel_mandatory: bool
     allotment: int
     payment_type: str
@@ -132,6 +133,7 @@ class SuggestedRoomInfo:
 class SuggestedRateInfo:
     rate_key: str
     total_rate: float
+    hotel_rate: float
 
 
 @dataclass

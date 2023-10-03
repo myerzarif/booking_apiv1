@@ -23,3 +23,12 @@ class Availability():
             raise ThirdPartyAPIFailure
 
         return response.json()
+
+    def get_search_info(self, item_id):
+        result = mongo_default_db["search_info"].find_one({"item_id": item_id})
+        if not result:
+            return None
+        
+        result.pop("info", None)
+
+        return result

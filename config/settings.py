@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'file.apps.FileConfig',
     'common.apps.CommonConfig',
     'content.apps.ContentConfig',
-    'hotel.apps.HotelConfig'
+    'hotel.apps.HotelConfig',
+    'car.apps.CarConfig'
 ]
 
 MIDDLEWARE = [
@@ -390,5 +391,5 @@ STRIPE_BASE_URL = os.environ.get("STRIPE_BASE_URL")
 REDIS_HOST = os.environ.get('REDIS_HOST', 'booking_redis')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
 
-HOTEL_FEE_PERCENTAGE = os.environ.get('HOTEL_FEE_PERCENTAGE', 0)
+HOTEL_FEE_PERCENTAGE = int(os.environ.get('HOTEL_FEE_PERCENTAGE', 0))
 CAR_FEE_PERCENTAGE = int(os.environ.get('CAR_FEE_PERCENTAGE', 0))
