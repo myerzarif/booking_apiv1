@@ -391,10 +391,16 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
     token = serializers.CharField(write_only=True)
     otp = serializers.CharField(write_only=True)
 
-    def get_username_and_otp(self):
-        username = cache.get(f"otp_token_{self.token}") or None
-        otp = cache.get(f"otp_{username}") or None
-        return username, otp
+    def get_username_and_otp(self, token, r):
+        if r.exists("otp_token_"+token):
+            username = r.get("otp_token_"+token)
+
+            if r.exists("otp_"+username):
+                otp = r.get("otp_"+username)
+                return username, otp
+
+            return username, None
+        return None, None
 
     def otp_validate(self):
         if settings.ENVIRONMENT_APP is not 'PRODUCTION' and self.otp == '11111':
