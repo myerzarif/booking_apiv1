@@ -39,6 +39,7 @@ class HbAvailability(Availability):
             method=HttpMethods.POST
         )
         self.exclude = filters.get("exclude", [])
+        self.collection_name = "search_info"
 
     def parse_occupancies(self, occupancy):
         result = {
@@ -128,7 +129,8 @@ class HbAvailability(Availability):
                 hotel_mandatory=to_float(available_rate.get("hotelMandatory")),
                 hotel_currency=HbCurrencies().get_by_code(available_rate.get("hotelCurrency")),
                 hotel_rate=get_hotel_rate(available_rate),
-                total_rate=get_total_amount(get_hotel_rate(available_rate), settings.HOTEL_FEE_PERCENTAGE),
+                total_rate=get_total_amount(get_hotel_rate(
+                    available_rate), settings.HOTEL_FEE_PERCENTAGE),
                 allotment=to_int(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
@@ -241,7 +243,7 @@ class HbAvailability(Availability):
 
         return response
 
-    def cache_availability_result(self, data: AvailabilityData, search_id):
+    def cache_availability_result(self, data: AvailabilityData, search_id, search_params):
         if not data.hotels:
             return []
 
@@ -251,6 +253,7 @@ class HbAvailability(Availability):
             item = self.seggested_item(search_id, hotel)
             mongo_item = asdict(item)
             mongo_item["info"] = dataclass_to_doc(hotel)
+            mongo_item["search_params"] = search_params
             mongo_item["expiry_date"] = datetime.utcnow(
             ) + timedelta(hours=settings.MONGO_SEARCH_CACHE)
             mongo_default_db["search_info"].insert_one(mongo_item)
@@ -278,7 +281,7 @@ class HbAvailability(Availability):
         if not result:
             response_data = self.remote_search()
             search_response = self.cache_availability_result(
-                response_data, search_id)
+                response_data, search_id, self.config.json)
             hotels = [asdict(item) for item in search_response]
             result = self.create_availability_response(hotels)
 

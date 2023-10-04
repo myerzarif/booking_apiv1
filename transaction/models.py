@@ -25,7 +25,7 @@ class Reservation(BaseModel):
     hotel_code = models.IntegerField()
     hotel_name = models.TextField()
     room_code = models.TextField()
-    room_name = models.TextField()
+    room_description = models.TextField()
     rate_key = models.TextField()
     hotel_item_id = models.TextField()
     car_code = models.TextField(blank=True, null=True)
@@ -34,9 +34,9 @@ class Reservation(BaseModel):
 
     total_amount = models.DecimalField(max_digits=7, decimal_places=2)
     hotel_amount = models.DecimalField(max_digits=7, decimal_places=2)
-    car_amount = models.DecimalField(max_digits=7, decimal_places=2)
+    car_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
     hotel_fee_amount = models.DecimalField(max_digits=7, decimal_places=2)
-    car_fee_amount = models.DecimalField(max_digits=7, decimal_places=2)
+    car_fee_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
 
     status = models.CharField(
         max_length=15,
@@ -45,7 +45,7 @@ class Reservation(BaseModel):
     )
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         ordering = ["-created_at"]

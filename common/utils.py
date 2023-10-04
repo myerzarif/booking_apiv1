@@ -112,10 +112,11 @@ def to_int(value):
     except Exception as e:
         logger.error("invalid int number: exception: {}".format(str(e)))
 
+
 def to_decimal(value):
     if value == 0:
         return float("{:.2f}".format(value))
-    
+
     if not value:
         return None
 
@@ -139,6 +140,7 @@ def generate_random_string(length=20):
     random.SystemRandom().shuffle(password_list)
     password = ''.join(password_list)
     return password
+
 
 def get_total_amount(amount, percentage):
     return to_decimal(float(amount) + (float(amount) * percentage/100))

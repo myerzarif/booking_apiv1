@@ -29,6 +29,7 @@ class TransactionView(LoggerMixin, ListAPIView):
     def get_queryset(self):
         return Transaction.objects.all().filter(active=True)
 
+
 class ReservationView(LoggerMixin, generics.GenericAPIView):
     """
     Initiate a Reservation
@@ -40,6 +41,5 @@ class ReservationView(LoggerMixin, generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         # params = serializer.validated_data
-        serializer.reserve()
-        data = {'detail': 'reservation initated!'}
-        return Response(data=data, status=200)
+        result = serializer.reserve(request.user)
+        return Response(data=result, status=200)

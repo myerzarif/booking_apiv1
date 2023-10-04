@@ -45,5 +45,4 @@ class HbRental(Rental):
         )
 
     def search(self):
-        cars = [asdict(self.get_dataclass_by_doc(item)) for item in list(mongo_default_db[self.collection_name].find(self.config.params).sort("price"))]
-        return cars
+        return [asdict(self.get_dataclass_by_doc(item)) for item in list(mongo_default_db[self.collection_name].find(self.config.params).sort("price"))]
