@@ -9,7 +9,9 @@ from common.pagination import MediumResultsSetPagination
 from django_filters import rest_framework as filters
 from rest_framework import filters as rest_filter
 from .filters import TransactionFilter
-from .models import Transaction
+from .models import Transaction, Reservation
+from rest_framework.serializers import Serializer
+from .serializers import UserDetailSerializer
 
 
 class TransactionView(LoggerMixin, ListAPIView):
@@ -43,3 +45,11 @@ class ReservationView(LoggerMixin, generics.GenericAPIView):
         # params = serializer.validated_data
         result = serializer.reserve(request.user)
         return Response(data=result, status=200)
+
+
+class ReservationDetailView(LoggerMixin, generics.RetrieveAPIView):
+    permission_classes = []
+    serializer_class = UserDetailSerializer
+
+    def get_queryset(self):
+        return Reservation.objects.filter(active=True)
