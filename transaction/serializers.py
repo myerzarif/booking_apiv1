@@ -47,6 +47,7 @@ class HolderSerializer(serializers.Serializer):
     country = serializers.CharField(required=True)
     phone_number = serializers.CharField(required=True)
 
+
 class ReservationSerializer(serializers.Serializer):
     item_id = serializers.CharField(required=True)
     car_code = serializers.CharField(required=False, allow_blank=True)
@@ -54,9 +55,12 @@ class ReservationSerializer(serializers.Serializer):
     def initiate_reservation(self, hotel_item, rental_car, user):
         hotel_amount = to_decimal(hotel_item.get("rate", {}).get("hotel_rate"))
         car_amount = to_decimal(rental_car.get("price", 0))
-        hotel_fee_amount = to_decimal(hotel_item.get("rate", {}).get("hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
-        car_fee_amount = to_decimal(rental_car.get("price", 0) * settings.CAR_FEE_PERCENTAGE/100)
-        total_amount = to_decimal(hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+        hotel_fee_amount = to_decimal(hotel_item.get("rate", {}).get(
+            "hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
+        car_fee_amount = to_decimal(rental_car.get(
+            "price", 0) * settings.CAR_FEE_PERCENTAGE/100)
+        total_amount = to_decimal(
+            hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
 
         reservation_doc = {
             "reference_id": generate_unique_id(),
@@ -89,6 +93,7 @@ class ReservationSerializer(serializers.Serializer):
             "car_code")) if self.validated_data.get("car_code") else {}
 
         return self.initiate_reservation(hotel_item, rental_car, user)
+
 
 class UserDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Serializer For Reservation Model"""
