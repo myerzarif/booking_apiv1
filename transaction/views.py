@@ -67,9 +67,9 @@ class PaymentView(LoggerMixin, CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.initiate_payment(request.data, self.request.user)
+        client_secret = serializer.initiate_payment(request.data, self.request.user)
         self.perform_create(serializer)
-        return Response(data={**serializer.data, "intent": "some_text"}, status=200)
+        return Response(data={**serializer.data, "intent_client_secret": client_secret}, status=200)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
