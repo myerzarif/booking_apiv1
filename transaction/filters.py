@@ -43,7 +43,6 @@ class TransactionFilter(django_filters.FilterSet):
 
     class Meta:
         model = Transaction
-        fields = ["payer",
-                  "status",
+        fields = ["status",
                   "date_duration",
                   "created_at"]

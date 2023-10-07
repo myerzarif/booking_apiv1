@@ -56,7 +56,6 @@ class Migration(migrations.Migration):
                 ('currency', models.TextField(blank=True, max_length=3, null=True)),
                 ('payment_method', models.TextField(blank=True, max_length=10, null=True)),
                 ('comment', models.TextField(blank=True, null=True)),
-                ('payer', models.CharField(blank=True, max_length=200, null=True)),
                 ('status', models.CharField(choices=[('Initiate', 'INITIATE'), ('Paid', 'PAID'), ('Success', 'SUCCESS'), ('Failed', 'FAILED'), ('Cancelled', 'CANCELLED'), ('Refund', 'REFUND')], default='Initiate', max_length=15)),
                 ('reservation', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='transaction.reservation')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),

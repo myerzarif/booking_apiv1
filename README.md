@@ -106,3 +106,5 @@ mongorestore --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookin
 We should run content.hotelbed.commands --> initial_indexes
 db.search_info.createIndex( { "expiry_date": 1 }, { expireAfterSeconds: 0 })
 
+
+https://github.com/stripe-samples/accept-a-payment/blob/main/custom-payment-flow/server/python/server.py

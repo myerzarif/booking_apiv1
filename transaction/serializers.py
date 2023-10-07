@@ -13,6 +13,11 @@ from car.hotelbeds.rental import HbRental
 from common.utils import generate_unique_id, to_decimal
 from .models import Reservation
 from rest_framework import exceptions
+import stripe
+import logging
+
+logger = logging.getLogger('project.transaction')
+
 
 class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_user')
@@ -23,7 +28,6 @@ class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "id",
             "created_at",
             "user",
-            "payer",
             "status",
             "comment",
         ]
@@ -32,14 +36,69 @@ class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_user(self, instance):
         return UserSerializer(User.objects.get(pk=instance.user_id)).data
 
-# {
-# 	id: "54e40663-93e0-4a2a-9d2b-04c1001d1ec2",
-# 	room_code: "DBL.DX",
-# 	rate_key: "20231010|20231011|W|148|88930|DBL.DX|FIT..",
-# 	bank_account: {},
-# 	holder_info: {}
-# }
 
+class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            "id",
+            "reservation",
+            "first_name",
+            "last_name",
+            "country",
+            "mobile",
+        ]
+        read_only_fields = ['id']
+
+    def initiate_payment(self, data, user):
+        reservation_data = ReservationSerializer(
+            Reservation.objects.get(pk=data.get("reservation"))).data
+        print("datadatadatadatadata", data)
+        print("reservation_datareservation_datareservation_data", reservation_data)
+        try:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            intent = stripe.PaymentIntent.create(
+                amount=to_decimal(reservation_data.get("total_amount")) * 100,
+                currency='usd',
+                receipt_email=user.email
+            )
+            print("intent_intent_intent_intent", intent)
+            return intent.get('client_secret')
+        except Exception as e:
+            logger.error("payment intent creation error. {}".format(str(e)))
+            raise exceptions.ValidationError("Payment validation error!")
+
+class StripeWebhookSerializer(serializers.Serializer):
+    pass
+
+# @app.route('/webhook', methods=['POST'])
+# def webhook():
+#     payload = request.get_data()
+#     sig_header = request.headers.get('Stripe_Signature', None)
+
+#     if not sig_header:
+#         return 'No Signature Header!', 400
+
+#     try:
+#         event = stripe.Webhook.construct_event(
+#             payload, sig_header, endpoint_secret
+#         )
+#     except ValueError as e:
+#         # Invalid payload
+#         return 'Invalid payload', 400
+#     except stripe.error.SignatureVerificationError as e:
+#         # Invalid signature
+#         return 'Invalid signature', 400
+
+#     if event['type'] == 'payment_intent.succeeded':
+#         email = event['data']['object']['receipt_email'] # contains the email that will recive the recipt for the payment (users email usually)
+        
+#         user_info['paid_50'] = True
+#         user_info['email'] = email
+#     else:
+#         return 'Unexpected event type', 400
+
+#     return '', 200
 
 class HolderSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=True)
@@ -89,17 +148,18 @@ class ReservationSerializer(serializers.Serializer):
     def reserve(self, user):
         hotel_item = HbAvailability().get_doc_by_item_id(
             self.validated_data.get("item_id"))
-        
+
         if not hotel_item:
-            raise exceptions.ValidationError("Hotel is not valid! Please try to search again.")
-        
+            raise exceptions.ValidationError(
+                "Hotel is not valid! Please try to search again.")
+
         rental_car = HbRental().get_doc_by_code(self.validated_data.get(
             "car_code")) if self.validated_data.get("car_code") else {}
 
         return self.initiate_reservation(hotel_item, rental_car, user)
 
 
-class UserDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class ReservationDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Serializer For Reservation Model"""
 
     class Meta:
