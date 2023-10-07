@@ -33,6 +33,12 @@ class HotelAvailabilityQueryParamSerializer(serializers.Serializer):
         allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS), required=False)
 
 
+class HotelUpdateAvailabilityQueryParamSerializer(serializers.Serializer):
+    stay = StaySerializer()
+    occupancies = OccupancyDataSerializer(many=True)
+    reservation_id = serializers.CharField()
+
+
 class HotelAvailabilitySerializer(DataclassSerializer):
     """
     Serializer for Hotel Content View

@@ -16,3 +16,9 @@ class BaseModel(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     active = models.BooleanField(default=True)
     last_modified = models.DateTimeField(auto_now=True)
+
+    def update(self, new_doc):
+        for key, value in new_doc.items():
+            setattr(self, key, value)
+        self.save()
+        return self

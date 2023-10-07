@@ -243,6 +243,36 @@ class HbAvailability(Availability):
 
         return response
 
+    def hotel_update_reservation(self, hotels, reservation_info):
+        if not hotels:
+            return
+
+        hotel = hotels[0]
+
+        hotel_amount = to_decimal(hotel.get("rate", {}).get("hotel_rate"))
+        car_amount = to_decimal(reservation_info.car_amount)
+        hotel_fee_amount = to_decimal(hotel.get("rate", {}).get("hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
+        car_fee_amount = to_decimal(reservation_info.car_fee_amount)
+        total_amount = to_decimal(hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+        
+        reservation_doc = {
+            "room_code": hotel.get("room", {}).get("code"),
+            "room_description": hotel.get("room", {}).get("description"),
+            "rate_key": hotel.get("rate", {}).get("rate_key"),
+            "hotel_item_id": hotel.get("item_id"),
+            "search": hotel.get("search_params"),
+            "total_amount": total_amount,
+            "hotel_amount": hotel_amount,
+            "car_amount": car_amount,
+            "hotel_fee_amount": hotel_fee_amount,
+            "car_fee_amount": car_fee_amount
+        }
+
+        result = reservation_info.update(reservation_doc)
+
+        return result.to_dict()
+
+
     def cache_availability_result(self, data: AvailabilityData, search_id, search_params):
         if not data.hotels:
             return []
@@ -286,3 +316,22 @@ class HbAvailability(Availability):
             result = self.create_availability_response(hotels)
 
         return result
+
+    @cache_memoize(10*60, args_rewrite=lambda self, reservation_info: f"{str(self.config.json)}_{str(reservation_info.id)}")
+    def hotel_update_search(self, reservation_info):
+        search_id = string_to_sha256hex(str(self.config.json))
+
+        # This will return the list of hotels in the chache based on searched id
+        result = self.get_data_from_mongo(search_id)
+
+        # If the cache is invalidated or the search is new we will query the hotel Supplier and update our cache
+        if not result:
+            response_data = self.remote_search()
+            search_response = self.cache_availability_result(
+                response_data, search_id, self.config.json)
+            hotels = [asdict(item) for item in search_response]
+            result = self.create_availability_response(hotels)
+
+        updated_reservation = self.hotel_update_reservation(result.get("hotels", []), reservation_info)
+
+        return updated_reservation

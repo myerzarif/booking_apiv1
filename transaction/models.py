@@ -51,6 +51,26 @@ class Reservation(BaseModel):
         ordering = ["-created_at"]
         get_latest_by = ["-created_at"]
 
+    def to_dict(self):
+        return {
+            "reservation_id": str(self.id),
+            "reference_id": str(self.id),
+            "user": None,
+            "hotel_code": self.hotel_code,
+            "hotel_name": self.hotel_name,
+            "room_code": self.room_code,
+            "room_description": self.room_description,
+            "rate_key": self.rate_key,
+            "hotel_item_id": self.hotel_item_id,
+            "car_code": self.car_code,
+            "car_name": self.car_name,
+            "search": self.search,
+            "total_amount": self.total_amount,
+            "hotel_amount": self.hotel_amount,
+            "car_amount": self.car_amount,
+            "hotel_fee_amount": self.hotel_fee_amount,
+            "car_fee_amount": self.car_fee_amount
+        }
 
 class Transaction(BaseModel):
     class TransactionStatus(models.TextChoices):

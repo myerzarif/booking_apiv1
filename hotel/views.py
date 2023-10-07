@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework import generics
 from config.logger import LoggerMixin
 from dataclasses import asdict
-from .serializers import HotelAvailabilityQueryParamSerializer, HotelBookingQueryParamSerializer
+from .serializers import HotelAvailabilityQueryParamSerializer, HotelBookingQueryParamSerializer, HotelUpdateAvailabilityQueryParamSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .hotelbeds.availability import HbAvailability
 from .hotelbeds.booking import HbBooking
+from transaction.models import Reservation
 
 
 class HotelAvailabilityView(LoggerMixin, generics.GenericAPIView):
@@ -27,6 +28,7 @@ class HotelAvailabilityView(LoggerMixin, generics.GenericAPIView):
         availabilities = HbAvailability(filters=filters).remote_search()
         return Response(data=asdict(availabilities), status=200)
 
+
 class HotelAvailabilityV2View(LoggerMixin, generics.GenericAPIView):
     """
     Check Hotel Availability V2
@@ -45,6 +47,29 @@ class HotelAvailabilityV2View(LoggerMixin, generics.GenericAPIView):
         return Response(data=availabilities, status=200)
 
 
+class HotelUpdateAvailabilityView(LoggerMixin, generics.GenericAPIView):
+    """
+    Check Hotel Availability Update
+    """
+    permission_classes = []
+    serializer_class = HotelUpdateAvailabilityQueryParamSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Search Hotels
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        filters = serializer.validated_data
+        reservation = Reservation.objects.get(pk=filters.get("reservation_id"))
+        if not reservation:
+            raise ValueError(
+                "Reservation is not valid! Please try to search again.")
+        filters["hotels"] = [reservation.hotel_code]
+        availabilities = HbAvailability(filters=filters).hotel_update_search(reservation)
+        return Response(data=availabilities, status=200)
+
+
 class HotelBookingView(LoggerMixin, generics.GenericAPIView):
     """
     Hotel Booking
@@ -59,5 +84,5 @@ class HotelBookingView(LoggerMixin, generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         params = serializer.validated_data
-        booking_response = HbBooking(params==params).book()
+        booking_response = HbBooking(params == params).book()
         return Response(data=asdict(booking_response), status=200)

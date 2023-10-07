@@ -117,7 +117,6 @@ class UserDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "hotel_amount",
             "car_amount",
             "hotel_fee_amount",
-            "car_fee_amount",
-            "status"
+            "car_fee_amount"
         ]
         read_only_fields = ['id']
