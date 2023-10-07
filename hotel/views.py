@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .hotelbeds.availability import HbAvailability
 from .hotelbeds.booking import HbBooking
 from transaction.models import Reservation
+from rest_framework import exceptions
 
 
 class HotelAvailabilityView(LoggerMixin, generics.GenericAPIView):
@@ -63,10 +64,11 @@ class HotelUpdateAvailabilityView(LoggerMixin, generics.GenericAPIView):
         filters = serializer.validated_data
         reservation = Reservation.objects.get(pk=filters.get("reservation_id"))
         if not reservation:
-            raise ValueError(
-                "Reservation is not valid! Please try to search again.")
+            raise exceptions.ValidationError("Reservation is not valid! Please try to search again.")
+        
         filters["hotels"] = [reservation.hotel_code]
-        availabilities = HbAvailability(filters=filters).hotel_update_search(reservation)
+        availabilities = HbAvailability(
+            filters=filters).hotel_update_search(reservation)
         return Response(data=availabilities, status=200)
 
 

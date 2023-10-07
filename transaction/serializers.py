@@ -12,7 +12,7 @@ from car.base.rental import Rental
 from car.hotelbeds.rental import HbRental
 from common.utils import generate_unique_id, to_decimal
 from .models import Reservation
-
+from rest_framework import exceptions
 
 class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_user')
@@ -89,6 +89,10 @@ class ReservationSerializer(serializers.Serializer):
     def reserve(self, user):
         hotel_item = HbAvailability().get_doc_by_item_id(
             self.validated_data.get("item_id"))
+        
+        if not hotel_item:
+            raise exceptions.ValidationError("Hotel is not valid! Please try to search again.")
+        
         rental_car = HbRental().get_doc_by_code(self.validated_data.get(
             "car_code")) if self.validated_data.get("car_code") else {}
 

@@ -36,7 +36,8 @@ class Reservation(BaseModel):
     hotel_amount = models.DecimalField(max_digits=7, decimal_places=2)
     car_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
     hotel_fee_amount = models.DecimalField(max_digits=7, decimal_places=2)
-    car_fee_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
+    car_fee_amount = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True)
 
     status = models.CharField(
         max_length=15,
@@ -71,6 +72,7 @@ class Reservation(BaseModel):
             "hotel_fee_amount": self.hotel_fee_amount,
             "car_fee_amount": self.car_fee_amount
         }
+
 
 class Transaction(BaseModel):
     class TransactionStatus(models.TextChoices):
