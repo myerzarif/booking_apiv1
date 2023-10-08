@@ -243,7 +243,7 @@ class HbAvailability(Availability):
 
         return response
 
-    def hotel_update_reservation(self, hotels, reservation_info):
+    def hotel_update_reservation(self, hotels, reservation_info, search_param):
         if not hotels:
             return
 
@@ -260,7 +260,7 @@ class HbAvailability(Availability):
             "room_description": hotel.get("room", {}).get("description"),
             "rate_key": hotel.get("rate", {}).get("rate_key"),
             "hotel_item_id": hotel.get("item_id"),
-            "search": hotel.get("search_params"),
+            "search": hotel.get("search_params", search_param),
             "total_amount": total_amount,
             "hotel_amount": hotel_amount,
             "car_amount": car_amount,
@@ -332,6 +332,6 @@ class HbAvailability(Availability):
             hotels = [asdict(item) for item in search_response]
             result = self.create_availability_response(hotels)
 
-        updated_reservation = self.hotel_update_reservation(result.get("hotels", []), reservation_info)
+        updated_reservation = self.hotel_update_reservation(result.get("hotels", []), reservation_info, self.config.json)
 
         return updated_reservation
