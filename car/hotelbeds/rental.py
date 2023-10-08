@@ -8,6 +8,9 @@ from common.extensions import mongo_default_db
 from dataclasses import asdict
 from common.decorators import check_null
 from common.utils import to_decimal
+from django.conf import settings
+from rest_framework import exceptions
+
 
 class HbRental(Rental):
 
@@ -46,3 +49,32 @@ class HbRental(Rental):
 
     def search(self):
         return [asdict(self.get_dataclass_by_doc(item)) for item in list(mongo_default_db[self.collection_name].find(self.config.params).sort("price"))]
+
+    def car_update_reservation(self, car, reservation_info):
+        if not car:
+            raise exceptions.ValidationError("Car not found!")
+
+        hotel_amount = to_decimal(reservation_info.hotel_amount)
+        car_amount = to_decimal(car.get("price", 0))
+        hotel_fee_amount = to_decimal(reservation_info.hotel_fee_amount)
+        car_fee_amount = to_decimal(
+            car.get("price", 0) * settings.CAR_FEE_PERCENTAGE/100)
+        total_amount = to_decimal(
+            hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+
+        reservation_doc = {
+            "car_code": car.get("code"),
+            "total_amount": total_amount,
+            "hotel_amount": hotel_amount,
+            "car_amount": car_amount,
+            "hotel_fee_amount": hotel_fee_amount,
+            "car_fee_amount": car_fee_amount
+        }
+
+        result = reservation_info.update(reservation_doc)
+
+        return result.to_dict()
+
+    def car_update_search(self, data, reservation_info):
+        car = self.get_doc_by_code(data.get("car_code"))
+        return self.car_update_reservation(car, reservation_info)

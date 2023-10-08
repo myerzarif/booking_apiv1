@@ -4,10 +4,12 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions
 from config.logger import LoggerMixin
 from dataclasses import asdict
-from .serializers import CarRentalSerializer, CarQueryParamSerializer, CarSerializer
+from .serializers import CarRentalSerializer, CarQueryParamSerializer, CarSerializer, CarUpdateAvailabilityQueryParamSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .hotelbeds.rental import HbRental
 from account.authentication import custom_permission_classes
+from transaction.models import Reservation
+from rest_framework import exceptions
 
 
 class CarDetailView(LoggerMixin, generics.GenericAPIView):
@@ -52,10 +54,33 @@ class CarView(LoggerMixin, generics.GenericAPIView):
         """
         Get Car Info
         """
-        
+
         # serializer = self.serializer_class(data=request.data)
         # serializer.is_valid(raise_exception=True)
         # filters = serializer.validated_data
-        
+
         cars = HbRental(params=request.query_params.dict()).search()
         return Response(data=cars, status=200)
+
+
+class CarUpdateAvailabilityView(LoggerMixin, generics.GenericAPIView):
+    """
+    Check Car Availability Update
+    """
+    permission_classes = []
+    serializer_class = CarUpdateAvailabilityQueryParamSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Change Car
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        reservation = Reservation.objects.get(pk=data.get("reservation_id"))
+        if not reservation:
+            raise exceptions.ValidationError(
+                "Reservation is not valid! Please try to search again.")
+
+        reservation_response = HbRental().car_update_search(data, reservation)
+        return Response(data=reservation_response, status=200)

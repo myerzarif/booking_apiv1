@@ -68,9 +68,9 @@ class HotelUpdateAvailabilityView(LoggerMixin, generics.GenericAPIView):
                 "Reservation is not valid! Please try to search again.")
 
         filters["hotels"] = [reservation.hotel_code]
-        availabilities = HbAvailability(
+        reservation_response = HbAvailability(
             filters=filters).hotel_update_search(reservation)
-        return Response(data=availabilities, status=200)
+        return Response(data=reservation_response, status=200)
 
 
 class HotelBookingView(LoggerMixin, generics.GenericAPIView):
