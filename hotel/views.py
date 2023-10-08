@@ -64,8 +64,9 @@ class HotelUpdateAvailabilityView(LoggerMixin, generics.GenericAPIView):
         filters = serializer.validated_data
         reservation = Reservation.objects.get(pk=filters.get("reservation_id"))
         if not reservation:
-            raise exceptions.ValidationError("Reservation is not valid! Please try to search again.")
-        
+            raise exceptions.ValidationError(
+                "Reservation is not valid! Please try to search again.")
+
         filters["hotels"] = [reservation.hotel_code]
         availabilities = HbAvailability(
             filters=filters).hotel_update_search(reservation)

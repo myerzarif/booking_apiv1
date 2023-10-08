@@ -25,6 +25,7 @@ from typing import List
 from common.extensions import mongo_default_db
 from datetime import datetime, timedelta
 from django.conf import settings
+from rest_framework import exceptions
 
 
 class HbAvailability(Availability):
@@ -239,7 +240,8 @@ class HbAvailability(Availability):
             "total": len(hotels)
         }
         if not hotels:
-            response["message"] = "There is no available stay for this search! Please change the date or occupancy info and try again."
+            raise exceptions.NotFound("There is no available stay for this search! Please change the date or occupancy info and try again.")
+            # response["message"] = "There is no available stay for this search! Please change the date or occupancy info and try again."
 
         return response
 
@@ -251,10 +253,12 @@ class HbAvailability(Availability):
 
         hotel_amount = to_decimal(hotel.get("rate", {}).get("hotel_rate"))
         car_amount = to_decimal(reservation_info.car_amount)
-        hotel_fee_amount = to_decimal(hotel.get("rate", {}).get("hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
+        hotel_fee_amount = to_decimal(hotel.get("rate", {}).get(
+            "hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
         car_fee_amount = to_decimal(reservation_info.car_fee_amount)
-        total_amount = to_decimal(hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
-        
+        total_amount = to_decimal(
+            hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+
         reservation_doc = {
             "room_code": hotel.get("room", {}).get("code"),
             "room_description": hotel.get("room", {}).get("description"),
@@ -271,7 +275,6 @@ class HbAvailability(Availability):
         result = reservation_info.update(reservation_doc)
 
         return result.to_dict()
-
 
     def cache_availability_result(self, data: AvailabilityData, search_id, search_params):
         if not data.hotels:
@@ -300,8 +303,7 @@ class HbAvailability(Availability):
 
         return self.create_availability_response(result)
 
-    @cache_memoize(10*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
-    def search_v2(self):
+    def search(self):
         search_id = string_to_sha256hex(str(self.config.json))
 
         # This will return the list of hotels in the chache based on searched id
@@ -317,21 +319,18 @@ class HbAvailability(Availability):
 
         return result
 
+    @cache_memoize(10*60, args_rewrite=lambda self: f"{str(self.config.json)}_{str(self.exclude)}")
+    def search_v2(self):
+        return self.search()
+
     @cache_memoize(10*60, args_rewrite=lambda self, reservation_info: f"{str(self.config.json)}_{str(reservation_info.id)}")
     def hotel_update_search(self, reservation_info):
-        search_id = string_to_sha256hex(str(self.config.json))
+        result = self.search()
 
-        # This will return the list of hotels in the chache based on searched id
-        result = self.get_data_from_mongo(search_id)
+        # if not result.get("hotels", []):
+        #     raise exceptions.NotFound("There is no available stay for this search! Please change the date or occupancy info and try again.")
 
-        # If the cache is invalidated or the search is new we will query the hotel Supplier and update our cache
-        if not result:
-            response_data = self.remote_search()
-            search_response = self.cache_availability_result(
-                response_data, search_id, self.config.json)
-            hotels = [asdict(item) for item in search_response]
-            result = self.create_availability_response(hotels)
-
-        updated_reservation = self.hotel_update_reservation(result.get("hotels", []), reservation_info, self.config.json)
+        updated_reservation = self.hotel_update_reservation(
+            result.get("hotels", []), reservation_info, self.config.json)
 
         return updated_reservation
