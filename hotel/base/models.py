@@ -74,6 +74,7 @@ class RateData:
     commission_vat: float
     commission_pct: float
     total_rate: float
+    total_rate_per_day: float
     hotel_rate: float
     hotel_mandatory: bool
     allotment: int
@@ -134,6 +135,7 @@ class SuggestedRateInfo:
     rate_key: str
     total_rate: float
     hotel_rate: float
+    total_rate_per_day: float
 
 
 @dataclass

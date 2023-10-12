@@ -133,6 +133,8 @@ class HbAvailability(Availability):
                 hotel_rate=get_hotel_rate(available_rate),
                 total_rate=get_total_amount(get_hotel_rate(
                     available_rate), settings.HOTEL_FEE_PERCENTAGE),
+                total_rate_per_day=to_decimal(get_total_amount(get_hotel_rate(
+                    available_rate), settings.HOTEL_FEE_PERCENTAGE) / self.config.json.get("days", 1)),
                 allotment=to_int(available_rate.get("allotment")),
                 payment_type=available_rate.get("paymentType"),
                 packaging=available_rate.get("packaging"),
@@ -213,6 +215,7 @@ class HbAvailability(Availability):
             rate_key=rooms[0].suggested_rate.rate_key,
             hotel_rate=rooms[0].suggested_rate.hotel_rate,
             total_rate=rooms[0].suggested_rate.total_rate,
+            total_rate_per_day=rooms[0].suggested_rate.total_rate_per_day
         )
 
     def seggested_item(self, search_id, hotel: AvailableHotelData):
