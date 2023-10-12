@@ -89,6 +89,7 @@ class Transaction(BaseModel):
     currency = models.TextField(max_length=3, blank=True, null=True)
     payment_method = models.TextField(max_length=10, blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
+    intent_client_secret = models.TextField(blank=True, null=True)
 
     first_name = models.CharField(max_length=200, blank=True, null=True)
     last_name = models.CharField(max_length=200, blank=True, null=True)
