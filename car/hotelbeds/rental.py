@@ -61,10 +61,14 @@ class HbRental(Rental):
             car.get("price", 0) * settings.CAR_FEE_PERCENTAGE/100)
         total_amount = to_decimal(
             hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+        total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)
+        total_car_amount = to_decimal(car_amount + car_fee_amount)
 
         reservation_doc = {
             "car_code": car.get("code"),
             "total_amount": total_amount,
+            "total_hotel_amount": total_hotel_amount,
+            "total_car_amount": total_car_amount,
             "hotel_amount": hotel_amount,
             "car_amount": car_amount,
             "hotel_fee_amount": hotel_fee_amount,

@@ -256,6 +256,9 @@ class HbAvailability(Availability):
         hotel_fee_amount = to_decimal(hotel.get("rate", {}).get(
             "hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
         car_fee_amount = to_decimal(reservation_info.car_fee_amount)
+        total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)
+        total_car_amount = to_decimal(car_amount + car_fee_amount)
+
         total_amount = to_decimal(
             hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
 
@@ -266,10 +269,12 @@ class HbAvailability(Availability):
             "hotel_item_id": hotel.get("item_id"),
             "search": hotel.get("search_params", search_param),
             "total_amount": total_amount,
+            "total_hotel_amount": total_hotel_amount,
+            "total_car_amount": total_car_amount,
             "hotel_amount": hotel_amount,
             "car_amount": car_amount,
             "hotel_fee_amount": hotel_fee_amount,
-            "car_fee_amount": car_fee_amount
+            "car_fee_amount": car_fee_amount,
         }
 
         result = reservation_info.update(reservation_doc)
