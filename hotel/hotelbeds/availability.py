@@ -244,7 +244,8 @@ class HbAvailability(Availability):
             "total": len(hotels)
         }
         if not hotels:
-            raise exceptions.NotFound("There is no available stay for this search! Please change the date or occupancy info and try again.")
+            raise exceptions.NotFound(
+                "There is no available stay for this search! Please change the date or occupancy info and try again.")
             # response["message"] = "There is no available stay for this search! Please change the date or occupancy info and try again."
 
         return response
@@ -256,15 +257,17 @@ class HbAvailability(Availability):
         hotel = hotels[0]
 
         hotel_amount = to_decimal(hotel.get("rate", {}).get("hotel_rate"))
-        car_amount = to_decimal(reservation_info.car_amount)
         hotel_fee_amount = to_decimal(hotel.get("rate", {}).get(
             "hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
-        car_fee_amount = to_decimal(reservation_info.car_fee_amount)
         total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)
-        total_car_amount = to_decimal(car_amount + car_fee_amount)
+
+        car_amount = to_decimal(reservation_info.car_amount)
+        car_fee_amount = to_decimal(reservation_info.car_fee_amount)
+        total_car_amount = to_decimal(search_param.get(
+            "days") * (car_amount + car_fee_amount))
 
         total_amount = to_decimal(
-            hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+            hotel_amount + hotel_fee_amount + (search_param.get("days") * (car_amount + car_fee_amount)))
 
         reservation_doc = {
             "room_code": hotel.get("room", {}).get("code"),

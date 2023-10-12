@@ -121,12 +121,12 @@ class ReservationSerializer(serializers.Serializer):
             "hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
         total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)
 
-        car_amount = to_decimal(rental_car.get("price", 0) * days)
-        car_fee_amount = to_decimal(rental_car.get("price", 0) * days * settings.CAR_FEE_PERCENTAGE/100)
-        total_car_amount = to_decimal(car_amount + car_fee_amount)
+        car_amount = to_decimal(rental_car.get("price", 0))
+        car_fee_amount = to_decimal(rental_car.get("price", 0) * settings.CAR_FEE_PERCENTAGE/100)
+        total_car_amount = to_decimal(days * (car_amount + car_fee_amount))
 
         total_amount = to_decimal(
-            hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
+            hotel_amount + hotel_fee_amount + (days * (car_amount + car_fee_amount)))
 
         reservation_doc = {
             "reference_id": generate_unique_id(),
