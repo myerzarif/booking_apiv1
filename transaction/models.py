@@ -33,8 +33,8 @@ class Reservation(BaseModel):
     search = models.JSONField()
 
     total_amount = models.DecimalField(max_digits=7, decimal_places=2)
-    total_hotel_amount = models.DecimalField(max_digits=7, decimal_places=2)
-    total_car_amount = models.DecimalField(max_digits=7, decimal_places=2)
+    total_hotel_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
+    total_car_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
     hotel_amount = models.DecimalField(max_digits=7, decimal_places=2)
     car_amount = models.DecimalField(max_digits=7, decimal_places=2, null=True)
     hotel_fee_amount = models.DecimalField(max_digits=7, decimal_places=2)
