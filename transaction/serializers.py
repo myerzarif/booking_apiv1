@@ -21,6 +21,7 @@ logger = logging.getLogger('project.transaction')
 
 class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_user')
+    reservation = serializers.SerializerMethodField('get_reservation')
 
     class Meta:
         model = Transaction
@@ -30,12 +31,15 @@ class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "user",
             "status",
             "comment",
+            "reservation"
         ]
         read_only_fields = ['id']
 
     def get_user(self, instance):
         return UserSerializer(User.objects.get(pk=instance.user_id)).data
 
+    def get_reservation(self, instance):
+        return ReservationDetailSerializer(Reservation.objects.get(pk=instance.reservation_id)).data
 
 class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:

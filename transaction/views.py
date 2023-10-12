@@ -11,6 +11,7 @@ from rest_framework import filters as rest_filter
 from .filters import TransactionFilter
 from .models import Transaction, Reservation
 from rest_framework.serializers import Serializer
+from account.models import User
 
 
 class TransactionView(LoggerMixin, ListAPIView):
@@ -28,6 +29,8 @@ class TransactionView(LoggerMixin, ListAPIView):
     ordering = ('-created_at')
 
     def get_queryset(self):
+        if self.request.user.role == User.UserRole.DEFAULT:
+            return Transaction.objects.all().filter(active=True, user_id=self.request.user.id)
         return Transaction.objects.all().filter(active=True)
 
 
@@ -67,12 +70,14 @@ class PaymentView(LoggerMixin, CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        intent_client_secret = serializer.initiate_payment(request.data, self.request.user)
+        intent_client_secret = serializer.initiate_payment(
+            request.data, self.request.user)
         self.perform_create(serializer, intent_client_secret)
         return Response(data={**serializer.data, "intent_client_secret": intent_client_secret}, status=200)
 
     def perform_create(self, serializer, intent_client_secret):
-        serializer.save(user=self.request.user, intent_client_secret=intent_client_secret)
+        serializer.save(user=self.request.user,
+                        intent_client_secret=intent_client_secret)
 
 
 class StripeWebhookView(LoggerMixin, generics.GenericAPIView):
