@@ -51,14 +51,13 @@ class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def initiate_payment(self, data, user):
-        reservation_data = ReservationSerializer(
-            Reservation.objects.get(pk=data.get("reservation"))).data
+        reservation_data = Reservation.objects.get(pk=data.get("reservation")).to_dict()
         print("datadatadatadatadata", data)
         print("reservation_datareservation_datareservation_data", reservation_data)
         try:
             stripe.api_key = settings.STRIPE_SECRET_KEY
             intent = stripe.PaymentIntent.create(
-                amount=to_decimal(reservation_data.get("total_amount")) * 100,
+                amount=int(to_decimal(reservation_data.get("total_amount")) * 100),
                 currency='usd',
                 receipt_email=user.email
             )
