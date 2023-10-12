@@ -115,14 +115,14 @@ class ReservationSerializer(serializers.Serializer):
     car_code = serializers.CharField(required=False, allow_blank=True)
 
     def initiate_reservation(self, hotel_item, rental_car, user):
+        days = hotel_item.get("search_params").get("days")
         hotel_amount = to_decimal(hotel_item.get("rate", {}).get("hotel_rate"))
         hotel_fee_amount = to_decimal(hotel_item.get("rate", {}).get(
             "hotel_rate") * settings.HOTEL_FEE_PERCENTAGE/100)
         total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)
 
-        car_amount = to_decimal(rental_car.get("price", 0))
-        car_fee_amount = to_decimal(rental_car.get(
-            "price", 0) * settings.CAR_FEE_PERCENTAGE/100)
+        car_amount = to_decimal(rental_car.get("price", 0) * days)
+        car_fee_amount = to_decimal(rental_car.get("price", 0) * days * settings.CAR_FEE_PERCENTAGE/100)
         total_car_amount = to_decimal(car_amount + car_fee_amount)
 
         total_amount = to_decimal(

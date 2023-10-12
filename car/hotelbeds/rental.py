@@ -53,12 +53,12 @@ class HbRental(Rental):
     def car_update_reservation(self, car, reservation_info):
         if not car:
             raise exceptions.ValidationError("Car not found!")
-
+        days = reservation_info.get("search", {}).get("days")
         hotel_amount = to_decimal(reservation_info.hotel_amount)
-        car_amount = to_decimal(car.get("price", 0))
+        car_amount = to_decimal(car.get("price", 0) * days)
         hotel_fee_amount = to_decimal(reservation_info.hotel_fee_amount)
         car_fee_amount = to_decimal(
-            car.get("price", 0) * settings.CAR_FEE_PERCENTAGE/100)
+            car.get("price", 0) * days * settings.CAR_FEE_PERCENTAGE/100)
         total_amount = to_decimal(
             hotel_amount + car_amount + hotel_fee_amount + car_fee_amount)
         total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)

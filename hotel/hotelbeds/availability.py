@@ -64,7 +64,8 @@ class HbAvailability(Availability):
                 "checkIn": str(filters['stay']['check_in']),
                 "checkOut": str(filters['stay']['check_out'])
             },
-            "occupancies": [self.parse_occupancies(occupancy) for occupancy in filters['occupancies']]
+            "occupancies": [self.parse_occupancies(occupancy) for occupancy in filters['occupancies']],
+            "days": (filters['stay']['check_out'] - filters['stay']['check_in']).days
         }
 
         if filters.get("hotels"):
