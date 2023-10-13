@@ -44,5 +44,5 @@ class CarQueryParamSerializer(serializers.Serializer):
 
 
 class CarUpdateAvailabilityQueryParamSerializer(serializers.Serializer):
-    car_code = serializers.CharField()
+    car_code = serializers.CharField(required=False, allow_blank=True)
     reservation_id = serializers.CharField()

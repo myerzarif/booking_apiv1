@@ -77,7 +77,7 @@ class CarUpdateAvailabilityView(LoggerMixin, generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        reservation = Reservation.objects.get(pk=data.get("reservation_id"))
+        reservation = Reservation().get_or_null(data.get("reservation_id"))
         if not reservation:
             raise exceptions.ValidationError(
                 "Reservation is not valid! Please try to search again.")

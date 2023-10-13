@@ -65,8 +65,8 @@ class HbRental(Rental):
             hotel_amount + hotel_fee_amount + (days * (car_amount + car_fee_amount)))
 
         reservation_doc = {
-            "car_code": car.get("code", ""),
-            "car_name": car.get("name", ""),
+            "car_code": car.get("code"),
+            "car_name": car.get("name"),
             "total_amount": total_amount,
             "total_hotel_amount": total_hotel_amount,
             "total_car_amount": total_car_amount,
@@ -81,5 +81,5 @@ class HbRental(Rental):
         return result.to_dict()
 
     def car_update_search(self, data, reservation_info):
-        car = self.get_doc_by_code(data.get("car_code")) or {}
+        car = self.get_doc_by_code(data.get("car_code", "")) or {}
         return self.car_update_reservation(car, reservation_info)

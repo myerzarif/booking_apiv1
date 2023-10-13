@@ -10,7 +10,7 @@ class BaseModel(models.Model):
     """
     class Meta:
         ordering = ["-created_at"]
-        abstract=True
+        abstract = True
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now)
@@ -22,3 +22,9 @@ class BaseModel(models.Model):
             setattr(self, key, value)
         self.save()
         return self
+
+    def get_or_null(self, id):
+        try:
+            return type(self).objects.get(pk=id)
+        except Exception as e:
+            return None
