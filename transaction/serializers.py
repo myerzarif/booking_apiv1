@@ -41,7 +41,14 @@ class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_reservation(self, instance):
         return ReservationDetailSerializer(Reservation.objects.get(pk=instance.reservation_id)).data
 
+
 class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    reservation = serializers.CharField(min_length=1)
+    first_name = serializers.CharField(min_length=1)
+    last_name = serializers.CharField(min_length=1)
+    country = serializers.CharField(min_length=1)
+    mobile = serializers.CharField(min_length=1)
+
     class Meta:
         model = Transaction
         fields = [
@@ -55,13 +62,17 @@ class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def initiate_payment(self, data, user):
-        reservation_data = Reservation.objects.get(pk=data.get("reservation")).to_dict()
-        print("datadatadatadatadata", data)
-        print("reservation_datareservation_datareservation_data", reservation_data)
+        reservation_data = Reservation().get_or_null(data.get("reservation"))
+        if not reservation_data:
+            raise exceptions.ValidationError(
+                "Reservation is not valid! Please try to search again.")
+
+        reservation_data = reservation_data.to_dict()
         try:
             stripe.api_key = settings.STRIPE_SECRET_KEY
             intent = stripe.PaymentIntent.create(
-                amount=int(to_decimal(reservation_data.get("total_amount")) * 100),
+                amount=int(to_decimal(
+                    reservation_data.get("total_amount")) * 100),
                 currency='usd',
                 receipt_email=user.email
             )
@@ -70,6 +81,7 @@ class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         except Exception as e:
             logger.error("payment intent creation error. {}".format(str(e)))
             raise exceptions.ValidationError("Payment validation error!")
+
 
 class StripeWebhookSerializer(serializers.Serializer):
     pass
@@ -95,13 +107,14 @@ class StripeWebhookSerializer(serializers.Serializer):
 
 #     if event['type'] == 'payment_intent.succeeded':
 #         email = event['data']['object']['receipt_email'] # contains the email that will recive the recipt for the payment (users email usually)
-        
+
 #         user_info['paid_50'] = True
 #         user_info['email'] = email
 #     else:
 #         return 'Unexpected event type', 400
 
 #     return '', 200
+
 
 class HolderSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=True)
@@ -122,7 +135,8 @@ class ReservationSerializer(serializers.Serializer):
         total_hotel_amount = to_decimal(hotel_amount + hotel_fee_amount)
 
         car_amount = to_decimal(rental_car.get("price", 0))
-        car_fee_amount = to_decimal(rental_car.get("price", 0) * settings.CAR_FEE_PERCENTAGE/100)
+        car_fee_amount = to_decimal(rental_car.get(
+            "price", 0) * settings.CAR_FEE_PERCENTAGE/100)
         total_car_amount = to_decimal(days * (car_amount + car_fee_amount))
 
         total_amount = to_decimal(
