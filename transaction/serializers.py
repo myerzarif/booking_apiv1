@@ -43,11 +43,11 @@ class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 class PaymentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    reservation = serializers.CharField(min_length=1)
-    first_name = serializers.CharField(min_length=1)
-    last_name = serializers.CharField(min_length=1)
-    country = serializers.CharField(min_length=1)
-    mobile = serializers.CharField(min_length=1)
+    # reservation = serializers.CharField(min_length=1)
+    # first_name = serializers.CharField(min_length=1)
+    # last_name = serializers.CharField(min_length=1)
+    # country = serializers.CharField(min_length=1)
+    # mobile = serializers.CharField(min_length=1)
 
     class Meta:
         model = Transaction
