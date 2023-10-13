@@ -346,3 +346,35 @@ class HbAvailability(Availability):
             result.get("hotels", []), reservation_info, self.config.json)
 
         return updated_reservation
+
+    def create_new_item(self, item, room, item_id):
+        item["item_id"] = generate_unique_id()
+        item["search_id"] = item_id + "_OTHER_ROOMS"
+        item["room"] = {
+            "code": room.get("room", {}).get("code"),
+            "description": room.get("room", {}).get("description"),
+        }
+        item["rate"] = {
+            "rate_key": room.get("suggested_rate", {}).get("rate_key"),
+            "total_rate": room.get("suggested_rate", {}).get("total_rate"),
+            "hotel_rate": room.get("suggested_rate", {}).get("hotel_rate"),
+            "total_rate_per_day": room.get("suggested_rate", {}).get("total_rate_per_day"),
+        }
+        item.pop("_id", None)
+        mongo_default_db["search_info"].insert_one(item)
+
+    def create_other_rooms(self, item_id):
+        item = mongo_default_db["search_info"].find_one({"item_id": item_id}, {"_id": 0})
+        other_rooms = item.get("info", {}).get("rooms", [])
+        for room in other_rooms:
+            self.create_new_item(item, room, item_id)
+
+    @cache_memoize(10*60, args_rewrite=lambda self, item_id: f"{str(item_id)}")
+    def hotel_other_rooms_search(self, item_id):
+        result = self.get_data_from_mongo(item_id + "_OTHER_ROOMS")
+
+        if not result:
+            self.create_other_rooms(item_id)
+            result = self.get_data_from_mongo(item_id + "_OTHER_ROOMS")
+
+        return result

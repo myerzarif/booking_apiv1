@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from config.logger import LoggerMixin
 from dataclasses import asdict
-from .serializers import HotelAvailabilityQueryParamSerializer, HotelBookingQueryParamSerializer, HotelUpdateAvailabilityQueryParamSerializer
+from .serializers import HotelAvailabilityQueryParamSerializer, HotelBookingQueryParamSerializer, HotelUpdateAvailabilityQueryParamSerializer, HotelOtherRoomAvailabilityQueryParamSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .hotelbeds.availability import HbAvailability
 from .hotelbeds.booking import HbBooking
@@ -89,3 +89,21 @@ class HotelBookingView(LoggerMixin, generics.GenericAPIView):
         params = serializer.validated_data
         booking_response = HbBooking(params == params).book()
         return Response(data=asdict(booking_response), status=200)
+
+
+class HotelOtherRoomAvailabilityView(LoggerMixin, generics.GenericAPIView):
+    """
+    Check Hotel Other Room Availability
+    """
+    permission_classes = []
+    serializer_class = HotelOtherRoomAvailabilityQueryParamSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Search for Other Rooms
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        params = serializer.validated_data
+        response = HbAvailability().hotel_other_rooms_search(params.get("item_id"))
+        return Response(data=response, status=200)

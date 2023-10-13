@@ -39,6 +39,10 @@ class HotelUpdateAvailabilityQueryParamSerializer(serializers.Serializer):
     reservation_id = serializers.CharField()
 
 
+class HotelOtherRoomAvailabilityQueryParamSerializer(serializers.Serializer):
+    item_id = serializers.CharField()
+
+
 class HotelAvailabilitySerializer(DataclassSerializer):
     """
     Serializer for Hotel Content View
