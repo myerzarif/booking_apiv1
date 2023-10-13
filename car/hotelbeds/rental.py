@@ -50,9 +50,7 @@ class HbRental(Rental):
     def search(self):
         return [asdict(self.get_dataclass_by_doc(item)) for item in list(mongo_default_db[self.collection_name].find(self.config.params).sort("price"))]
 
-    def car_update_reservation(self, car, reservation_info):
-        if not car:
-            raise exceptions.ValidationError("Car not found!")
+    def car_update_reservation(self, car, reservation_info):        
         days = reservation_info.search.get("days")
         hotel_amount = to_decimal(reservation_info.hotel_amount)
         hotel_fee_amount = to_decimal(reservation_info.hotel_fee_amount)
@@ -67,8 +65,8 @@ class HbRental(Rental):
             hotel_amount + hotel_fee_amount + (days * (car_amount + car_fee_amount)))
 
         reservation_doc = {
-            "car_code": car.get("code"),
-            "car_name": car.get("name"),
+            "car_code": car.get("code", ""),
+            "car_name": car.get("name", ""),
             "total_amount": total_amount,
             "total_hotel_amount": total_hotel_amount,
             "total_car_amount": total_car_amount,
@@ -83,5 +81,5 @@ class HbRental(Rental):
         return result.to_dict()
 
     def car_update_search(self, data, reservation_info):
-        car = self.get_doc_by_code(data.get("car_code"))
+        car = self.get_doc_by_code(data.get("car_code")) or {}
         return self.car_update_reservation(car, reservation_info)
