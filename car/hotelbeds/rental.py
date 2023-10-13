@@ -68,6 +68,7 @@ class HbRental(Rental):
 
         reservation_doc = {
             "car_code": car.get("code"),
+            "car_name": car.get("name"),
             "total_amount": total_amount,
             "total_hotel_amount": total_hotel_amount,
             "total_car_amount": total_car_amount,
