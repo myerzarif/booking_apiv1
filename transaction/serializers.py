@@ -31,6 +31,10 @@ class TransactionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "user",
             "status",
             "comment",
+            "first_name",
+            "last_name",
+            "email",
+            "mobile",
             "reservation"
         ]
         read_only_fields = ['id']
