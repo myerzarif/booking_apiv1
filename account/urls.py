@@ -16,7 +16,8 @@ from .views import (
     GetPasswordTokenView,
     OtpLoginView,
     OtpVerifyView,
-    OtpResendView
+    OtpResendView,
+    GoogleLoginView
 )
 
 app_name = 'account'
@@ -37,6 +38,8 @@ urlpatterns = [
     path('user/otp/login', OtpLoginView.as_view(), name='otp_login'),
     path('user/otp/verify', OtpVerifyView.as_view(), name='otp_verify'),
     path('user/otp/resend', OtpResendView.as_view(), name='otp_resend'),
+    path('user/google/login', GoogleLoginView.as_view(), name='google_login'),
+
 ]
 
 if settings.ENVIRONMENT_APP == 'DEVELOPE':

@@ -9,6 +9,7 @@ from account.models import User
 from .filters import UserFilter
 from .models import AccessToken, User
 from .validators import confirm_password_validator
+import requests
 
 from .serializers import (
     AccessTokenSerializer,
@@ -20,7 +21,8 @@ from .serializers import (
     ResetPasswordSerializer,
     EmailVerificationSerializer,
     OtpLoginSerializer,
-    OtpVerifySerializer
+    OtpVerifySerializer,
+    GoogleLoginSerializer
 )
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
@@ -320,3 +322,62 @@ class OtpResendView(LoggerMixin, generics.GenericAPIView):
         data = {'detail': 'OTP sent successfully!', 'token': token}
 
         return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
+    """
+    Generate Token and validate id_token google
+    parameters of login is id_token google
+    return access token consist: Key, User
+    """
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = GoogleLoginSerializer
+
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="POST", rate='20/m', block=True))
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        id_token = serializer.validated_data["id_token"]
+        email = self.validate_token_google(id_token)
+        user = self.get_user_by_mail(email)
+        origin = request.META.get('HTTP_ORIGIN')
+        token = AccessToken.objects.create(user=user, origin=origin or "",
+                                           user_agent=get_user_agent_header(request))
+        user.last_login = timezone.now()
+        user.save()
+        data = AccessTokenSerializer(instance=token, context={'request': request}).data
+        return Response(data=data, status=200)
+
+    def get_user_by_mail(self, email):
+        users = User.objects.filter(email=email)
+        if users:
+            user_obj = users[0]
+            user_obj.email_verified = True
+            user_obj.status = User.UserStatus.ACTIVE
+            user_obj.save()
+        else:
+            user_obj = User()
+            user_obj.email = email
+            user_obj.email_verified = True
+            user_obj.status = User.UserStatus.ACTIVE
+        return user_obj
+
+
+    def validate_token_google(self, id_token):
+        try:
+            response = requests.get(
+                settings.GOOGLE_ID_TOKEN_INFO_URL,
+                params={'id_token': id_token}
+            )
+            if not response.ok:
+                raise exceptions.ValidationError("Google Authentication Failed!")
+
+            audience = response.json()['aud']
+
+            if audience != settings.GOOGLE_OAUTH2_CLIENT_ID:
+                raise exceptions.ValidationError("Google Authentication Failed!")
+
+            return response.json()["email"]
+        except Exception as e:
+            raise exceptions.ValidationError("Google Authentication Failed!")
+
