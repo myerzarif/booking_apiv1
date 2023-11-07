@@ -6,7 +6,16 @@ from .models import Transaction
 class TransactionFilter(django_filters.FilterSet):
     date_duration = django_filters.CharFilter(
         field_name='created_at', method='created_days')
+    
+    created_at_from = django_filters.DateTimeFilter(field_name='created_at', method='created_at_from_filter')
+    created_at_to = django_filters.DateTimeFilter(field_name='created_at', method='created_at_to_filter')
 
+    def created_at_from_filter(self, queryset, name, value):
+        return queryset.filter(created_at__gte=value)
+    
+    def created_at_to_filter(self, queryset, name, value):
+        return queryset.filter(created_at__lte=value)
+    
     def created_days(self, queryset, name, value):
         today = datetime.now()
         if value == "Today":
@@ -40,4 +49,7 @@ class TransactionFilter(django_filters.FilterSet):
         model = Transaction
         fields = ["status",
                   "date_duration",
-                  "created_at"]
+                  "created_at",
+                  "created_at_from",
+                  "created_at_to",
+                  ]

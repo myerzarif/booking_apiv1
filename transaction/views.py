@@ -26,6 +26,7 @@ class TransactionView(LoggerMixin, ListAPIView):
     permission_classes = [IsAuthenticated]
     name = "transaction"
     ordering_fields = ('user', 'status', 'created_at', "total_amount")
+    search_fields = ['status', 'created_at', "last_name", "first_name", "mobile", "email"]
     ordering = ('-created_at')
 
     def get_queryset(self):
