@@ -18,7 +18,8 @@ from .views import (
     OtpVerifyView,
     OtpResendView,
     GoogleLoginView,
-    DashboardView
+    DashboardView,
+    UserBlockUnblockView
 )
 
 app_name = 'account'
@@ -41,6 +42,7 @@ urlpatterns = [
     path('user/otp/resend', OtpResendView.as_view(), name='otp_resend'),
     path('user/google/login', GoogleLoginView.as_view(), name='google_login'),
     path('dashboard', DashboardView.as_view(), name='dashboard_info'),
+    path('user/block', UserBlockUnblockView.as_view(), name='block_unblock_view'),
 ]
 
 if settings.ENVIRONMENT_APP == 'DEVELOPE':

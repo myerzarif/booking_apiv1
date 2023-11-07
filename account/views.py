@@ -23,7 +23,8 @@ from .serializers import (
     OtpLoginSerializer,
     OtpVerifySerializer,
     GoogleLoginSerializer,
-    DashboardSerializer
+    DashboardSerializer,
+    UserBlockSerializer
 )
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
@@ -391,3 +392,14 @@ class DashboardView(LoggerMixin, generics.GenericAPIView):
         serializer = self.get_serializer()
         data = serializer.get_info()
         return Response(data=data, status=200)
+
+
+class UserBlockUnblockView(LoggerMixin, generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserBlockSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.block_unblock_user(serializer.validated_data)
+        return Response(data={'detail': 'Action done successfully!'}, status=200)

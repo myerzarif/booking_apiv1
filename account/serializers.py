@@ -502,3 +502,23 @@ class DashboardSerializer(serializers.Serializer):
             "transactions": transactions,
             "users": users
         }
+    
+class UserBlockSerializer(serializers.Serializer):
+    active = serializers.BooleanField(required=True)
+    user_id = serializers.CharField(required=True)
+
+    def block_unblock_user(self, data):
+        logged_in_user = None
+        request = self.context.get('request', None)
+        if request:
+            logged_in_user = request.user
+
+        if logged_in_user.role in [User.UserRole.TECH, User.UserRole.ADMIN]:
+            try:
+                user = User.objects.get(id=data.get("user_id", ""))
+                user.active = data.get("active", True)
+            except User.DoesNotExist:
+                raise exceptions.NotFound("The user does not exist!")
+        else:
+            raise exceptions.PermissionDenied()
+
