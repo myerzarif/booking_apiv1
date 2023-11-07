@@ -8,36 +8,31 @@ class TransactionFilter(django_filters.FilterSet):
         field_name='created_at', method='created_days')
 
     def created_days(self, queryset, name, value):
+        today = datetime.now()
         if value == "Today":
-            start_date = date.today()
-            end_date = date.today()
-            return queryset.filter(created_at__gte=datetime.date(start_date),
-                                   created_at__lte=datetime.date(end_date))
+            start_date = today.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = start_date + timedelta(days=1)
+            return queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
         elif value == "Yesterday":
-            start_date = date.today() - timedelta(days=1)
-            end_date = start_date - timedelta(days=1)
-            return queryset.filter(created_at__gte=datetime.date(start_date),
-                                   created_at__lte=datetime.date(end_date))
+            start_date = (today - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = start_date + timedelta(days=1)
+            return queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
         elif value == "This Week":
-            start_date = date.today() - timedelta(days=6)
-            end_date = date.today()
-            return queryset.filter(created_at__gte=datetime.date(start_date),
-                                   created_at__lte=datetime.date(end_date))
+            start_date = (today - timedelta(days=6)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = today
+            return queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
         elif value == "Last Week":
-            start_date = date.today() - timedelta(days=13)
-            end_date = date.today() - timedelta(days=7)
-            return queryset.filter(created_at__gte=datetime.date(start_date),
-                                   created_at__lte=datetime.date(end_date))
+            start_date = (today - timedelta(days=13)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = (today - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
+            return queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
         elif value == "This Month":
-            start_date = date.today().replace(day=1)
-            end_date = date.today()
-            return queryset.filter(created_at__gte=datetime.date(start_date),
-                                   created_at__lte=datetime.date(end_date))
+            start_date = (today.replace(day=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = today
+            return queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
         elif value == "Last Month":
-            start_date = date.today().replace(day=1) - timedelta(month=1)
-            end_date = start_date + timedelta(month=1) - timedelta(days=1)
-            return queryset.filter(created_at__gte=datetime.date(start_date),
-                                   created_at__lte=datetime.date(end_date))
+            start_date = (today.replace(day=1)-timedelta(days=1)).replace(day=1).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = (today.replace(day=1)-timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+            return queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
         elif value == "All Time":
             return queryset
 
