@@ -65,7 +65,8 @@ class HbAvailability(Availability):
                 "checkOut": str(filters['stay']['check_out'])
             },
             "occupancies": [self.parse_occupancies(occupancy) for occupancy in filters['occupancies']],
-            "days": (filters['stay']['check_out'] - filters['stay']['check_in']).days
+            "days": (filters['stay']['check_out'] - filters['stay']['check_in']).days,
+            # "offset": filters.get("offset", 0),
         }
 
         if filters.get("hotels"):
@@ -74,6 +75,9 @@ class HbAvailability(Availability):
         elif filters.get("destinations"):
             params.update({"destinations": [{"code": code}
                           for code in filters["destinations"]]})
+
+        if filters.get("limit"):
+            params.update({"limit": filters.get("limit", 10)})
 
         return params
 
@@ -240,7 +244,7 @@ class HbAvailability(Availability):
 
     def create_availability_response(self, hotels):
         response = {
-            "hotels": hotels,
+            "hotels": hotels[:self.config.json.get("limit", 10)] if self.config.json.get("limit") else hotels,
             "total": len(hotels)
         }
         if not hotels:

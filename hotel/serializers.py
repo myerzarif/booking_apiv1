@@ -31,6 +31,7 @@ class HotelAvailabilityQueryParamSerializer(serializers.Serializer):
         child=serializers.CharField(), required=False)
     exclude = serializers.ListField(
         allow_null=True, child=serializers.ChoiceField(HOTEL_INFO_EXCLUDE_OPTIONS), required=False)
+    limit = serializers.IntegerField(required=False)
 
 
 class HotelUpdateAvailabilityQueryParamSerializer(serializers.Serializer):

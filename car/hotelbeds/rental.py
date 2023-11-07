@@ -24,16 +24,18 @@ class HbRental(Rental):
         )
         self.collection_name = "rental_car"
 
-    def create_request_data(self, params):
-        if not params:
-            return None
-
-        params = {
-            "name": params.get("name", ""),
-            "type": params.get("type", "")
+    def create_request_data(self, params={}):
+        filters = {
+            "active": True
         }
 
-        return params
+        if params.get("name"):
+            filters.update({"name": params.get("name", "")})
+
+        if params.get("type"):
+            filters.update({"type": params.get("type", "")})
+
+        return filters
 
     @check_null()
     def get_dataclass_by_doc(self, doc):
