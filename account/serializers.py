@@ -22,9 +22,11 @@ from django.utils.crypto import constant_time_compare, salted_hmac
 from common.types import UserType
 from django.core.cache import cache
 from config.settings import REDIS_HOST, REDIS_PORT
+from transaction.models import Transaction
 import redis
 import random
 import logging
+from common.extensions import mongo_default_db
 from .validators import (
     email_validator,
     password_validator,
@@ -484,3 +486,19 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
 
 class GoogleLoginSerializer(serializers.Serializer):
     id_token = serializers.CharField(write_only=True)
+
+
+class DashboardSerializer(serializers.Serializer):
+
+    def get_info(self):
+        hotels = mongo_default_db["hotels"].estimated_document_count()
+        cars = mongo_default_db["rental_car"].estimated_document_count()
+        transactions = Transaction.objects.count()
+        users = User.objects.filter(role=User.UserRole.DEFAULT).count()
+
+        return {
+            "hotels": hotels,
+            "cars": cars,
+            "transactions": transactions,
+            "users": users
+        }

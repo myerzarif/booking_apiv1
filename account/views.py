@@ -22,7 +22,8 @@ from .serializers import (
     EmailVerificationSerializer,
     OtpLoginSerializer,
     OtpVerifySerializer,
-    GoogleLoginSerializer
+    GoogleLoginSerializer,
+    DashboardSerializer
 )
 from .authentication import get_user_agent_header
 from config.logger import LoggerMixin
@@ -381,3 +382,12 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
         except Exception as e:
             raise exceptions.ValidationError("Google Authentication Failed!")
 
+
+class DashboardView(LoggerMixin, generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = DashboardSerializer
+
+    def get(self, request):
+        serializer = self.get_serializer()
+        data = serializer.get_info()
+        return Response(data=data, status=200)
