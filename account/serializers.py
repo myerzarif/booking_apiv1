@@ -326,6 +326,19 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
     """
     username = serializers.CharField(write_only=True)
 
+    def check_user_status(self, username, user_type):
+        try:
+            if user_type == 'email':
+                user = User.objects.get(email=username)
+                if user and user.status == User.UserStatus.BLOCKED:
+                    raise exceptions.PermissionDenied("User is blocked!")
+            if user_type == 'mobile':
+                user = User.objects.get(mobile=username)
+                if user and user.status == User.UserStatus.BLOCKED:
+                    raise exceptions.PermissionDenied("User is blocked!")
+        except User.DoesNotExist:
+            pass
+        
     def generate_token(self, username):
         dt = datetime.now()
         timestamp = int((dt - datetime(2001, 1, 1)).total_seconds())
@@ -345,6 +358,8 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
 
         if user_type not in ["email", "phone"]:
             raise exceptions.ValidationError('username type is not valid!')
+
+        self.check_user_status(username, user_type)
 
         r = redis.StrictRedis(
             host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
@@ -389,6 +404,8 @@ class OtpLoginSerializer(DynamicFieldsMixin, serializers.Serializer):
 
         if user_type not in ["email", "phone"]:
             raise exceptions.ValidationError('username type is not valid!')
+
+        self.check_user_status(username, user_type)
 
         r = redis.StrictRedis(
             host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
@@ -516,7 +533,8 @@ class UserBlockSerializer(serializers.Serializer):
         if logged_in_user.role in [User.UserRole.TECH, User.UserRole.ADMIN]:
             try:
                 user = User.objects.get(id=data.get("user_id", ""))
-                user.active = data.get("active", True)
+                user.status = User.UserStatus.ACTIVE if data.get("active") else User.UserStatus.BLOCKED
+                user.save()
             except User.DoesNotExist:
                 raise exceptions.NotFound("The user does not exist!")
         else:

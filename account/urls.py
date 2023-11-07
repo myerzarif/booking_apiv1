@@ -29,6 +29,7 @@ urlpatterns = [
     path('user/logout', LogoutView.as_view(), name='logout'),
     path('user/register', RegisterView.as_view(), name='register'),
     path('user/get_info', UserInfoView.as_view(), name='user_info'),
+    path('user/block', UserBlockUnblockView.as_view(), name='block_unblock_view'),
     path('user/<str:pk>', UserDetailView.as_view(), name='user'),
     path('user', UserView.as_view(), name='user'),
     path('user/password/change', ChangePasswordView.as_view(),
@@ -42,7 +43,6 @@ urlpatterns = [
     path('user/otp/resend', OtpResendView.as_view(), name='otp_resend'),
     path('user/google/login', GoogleLoginView.as_view(), name='google_login'),
     path('dashboard', DashboardView.as_view(), name='dashboard_info'),
-    path('user/block', UserBlockUnblockView.as_view(), name='block_unblock_view'),
 ]
 
 if settings.ENVIRONMENT_APP == 'DEVELOPE':

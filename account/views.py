@@ -398,7 +398,7 @@ class UserBlockUnblockView(LoggerMixin, generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserBlockSerializer
 
-    def post(self, request):
+    def patch(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.block_unblock_user(serializer.validated_data)
