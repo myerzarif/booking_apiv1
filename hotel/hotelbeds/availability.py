@@ -243,8 +243,9 @@ class HbAvailability(Availability):
         )
 
     def create_availability_response(self, hotels):
+
         response = {
-            "hotels": hotels[:self.config.json.get("limit", 10)] if self.config.json.get("limit") else hotels,
+            "hotels": hotels[:self.config.json.get("limit", 10)] if (self.config.json and self.config.json.get("limit")) else hotels,
             "total": len(hotels)
         }
         if not hotels:
