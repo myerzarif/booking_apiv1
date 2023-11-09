@@ -372,6 +372,9 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
                 params={'id_token': id_token}
             )
             if not response.ok:
+                print("response", response)
+                print("response text", response.text)
+                print("response json", response.json())
                 raise exceptions.ValidationError("Google Authentication Failed, Response is not OK!")
 
             audience = response.json()['aud']
