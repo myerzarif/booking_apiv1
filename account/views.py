@@ -372,16 +372,16 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
                 params={'id_token': id_token}
             )
             if not response.ok:
-                raise exceptions.ValidationError("Google Authentication Failed!")
+                raise exceptions.ValidationError("Google Authentication Failed, Response is not OK!")
 
             audience = response.json()['aud']
 
             if audience != settings.GOOGLE_OAUTH2_CLIENT_ID:
-                raise exceptions.ValidationError("Google Authentication Failed!")
+                raise exceptions.ValidationError("Google Authentication Failed, Invalid Audience!")
 
             return response.json()["email"]
         except Exception as e:
-            raise exceptions.ValidationError("Google Authentication Failed!")
+            raise exceptions.ValidationError("Google Authentication Failed! {}".format(str(e)))
 
 
 class DashboardView(LoggerMixin, generics.GenericAPIView):
