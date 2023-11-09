@@ -339,9 +339,9 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        id_token = serializer.validated_data["id_token"]
-        email = self.validate_token_google(id_token)
-        user = self.get_user_by_mail(email)
+        access_token = serializer.validated_data["access_token"]
+        user_object = self.validate_token_google(access_token)
+        user = self.get_or_create_user(user_object)
         origin = request.META.get('HTTP_ORIGIN')
         token = AccessToken.objects.create(user=user, origin=origin or "",
                                            user_agent=get_user_agent_header(request))
@@ -350,8 +350,8 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
         data = AccessTokenSerializer(instance=token, context={'request': request}).data
         return Response(data=data, status=200)
 
-    def get_user_by_mail(self, email):
-        users = User.objects.filter(email=email)
+    def get_or_create_user(self, user_object):
+        users = User.objects.filter(email=user_object.get("email"))
         if users:
             user_obj = users[0]
             user_obj.email_verified = True
@@ -359,32 +359,31 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
             user_obj.save()
         else:
             user_obj = User()
-            user_obj.email = email
+            user_obj.email = user_object.get("email")
             user_obj.email_verified = True
+            user_obj.first_name = user_object.get("given_name")
+            user_obj.last_name = user_object.get("family_name")
             user_obj.status = User.UserStatus.ACTIVE
         return user_obj
 
 
     def validate_token_google(self, access_token):
         try:
-            print("get request to google", settings.GOOGLE_ID_TOKEN_INFO_URL, access_token)
+            print("request to google", settings.GOOGLE_ID_USER_INFO_URL, access_token)
             response = requests.get(
                 settings.GOOGLE_ID_USER_INFO_URL,
                 params={"access_token": access_token},
                 headers={"Authorization": "Bearer {}".format(access_token), "Accept": "application/json"}
             )
             if not response.ok:
-                print("response", response)
-                print("response text", response.text)
-                print("response json", response.json())
                 raise exceptions.ValidationError("Google Authentication Failed, Response is not OK!")
 
-            audience = response.json()['aud']
+            # audience = response.json()['aud']
 
-            if audience != settings.GOOGLE_CLIENT_ID:
+            if not response.json().get("email"):
                 raise exceptions.ValidationError("Google Authentication Failed, Invalid Audience!")
 
-            return response.json()["email"]
+            return response.json()
         except Exception as e:
             raise exceptions.ValidationError("Google Authentication Failed! {}".format(str(e)))
 

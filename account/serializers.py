@@ -502,7 +502,7 @@ class OtpVerifySerializer(DynamicFieldsMixin, serializers.Serializer):
                 "Can not save new user: {0}".format(str(e)))
 
 class GoogleLoginSerializer(serializers.Serializer):
-    id_token = serializers.CharField(write_only=True)
+    access_token = serializers.CharField(write_only=True)
 
 
 class DashboardSerializer(serializers.Serializer):
