@@ -376,7 +376,7 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
 
             audience = response.json()['aud']
 
-            if audience != settings.GOOGLE_OAUTH2_CLIENT_ID:
+            if audience != settings.GOOGLE_CLIENT_ID:
                 raise exceptions.ValidationError("Google Authentication Failed, Invalid Audience!")
 
             return response.json()["email"]
