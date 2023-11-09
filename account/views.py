@@ -365,11 +365,13 @@ class GoogleLoginView(LoggerMixin, generics.GenericAPIView):
         return user_obj
 
 
-    def validate_token_google(self, id_token):
+    def validate_token_google(self, access_token):
         try:
+            print("get request to google", settings.GOOGLE_ID_TOKEN_INFO_URL, access_token)
             response = requests.get(
-                settings.GOOGLE_ID_TOKEN_INFO_URL,
-                params={'id_token': id_token}
+                settings.GOOGLE_ID_USER_INFO_URL,
+                params={"access_token": access_token},
+                headers={"Authorization": "Bearer {}".format(access_token), "Accept": "application/json"}
             )
             if not response.ok:
                 print("response", response)
