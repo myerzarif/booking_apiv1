@@ -14,6 +14,8 @@ from datetime import datetime
 from random import randint, randrange
 import logging
 from datetime import date
+from rest_framework import exceptions
+
 
 logger = logging.getLogger('project.common')
 
@@ -100,6 +102,7 @@ def to_float(value):
 
     except Exception as e:
         logger.error("invalid float number: exception: {}".format(str(e)))
+        raise exceptions.ValidationError("Invalid float number!")
 
 
 def to_int(value):
@@ -111,6 +114,7 @@ def to_int(value):
 
     except Exception as e:
         logger.error("invalid int number: exception: {}".format(str(e)))
+        raise exceptions.ValidationError("Invalid integer number!")
 
 
 def to_decimal(value):

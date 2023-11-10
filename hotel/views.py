@@ -1,7 +1,7 @@
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework import generics, permissions
 from config.logger import LoggerMixin
 from dataclasses import asdict
 from .serializers import HotelAvailabilityQueryParamSerializer, HotelBookingQueryParamSerializer, HotelUpdateAvailabilityQueryParamSerializer, HotelOtherRoomAvailabilityQueryParamSerializer
@@ -10,6 +10,7 @@ from .hotelbeds.availability import HbAvailability
 from .hotelbeds.booking import HbBooking
 from transaction.models import Reservation
 from rest_framework import exceptions
+from account.authentication import custom_permission_classes
 
 
 class HotelAvailabilityView(LoggerMixin, generics.GenericAPIView):

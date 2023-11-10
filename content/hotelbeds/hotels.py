@@ -4,6 +4,7 @@ from common.types import Coordinates, Address, Phone
 from content.base.models import HotelData, HotelRoomData
 from .locations import HbDestinations
 from common.utils import convert_string_to_date
+from dataclasses import asdict
 from rest_framework.exceptions import NotFound
 from cache_memoize import cache_memoize
 from .types import (
@@ -21,7 +22,7 @@ from content.base.hotels import (
     Hotels,
     HotelDetails,
 )
-
+from common.utils import to_int
 
 class HbHotels(Hotels):
 
@@ -41,11 +42,46 @@ class HbHotels(Hotels):
     def convert_phones(self, phones):
         return [Phone(number=phone.get("phoneNumber"), type=phone.get("phoneType")) for phone in phones]
 
-    def get_by_code(self, code, exclude=[]):
-        doc = self.get_doc_by_code(int(code))
-        if not doc:
-            raise NotFound("Hotel not found!")
+    def get_dataclass_by_doc_limited(self, doc):
+        return HotelData(
+            code=doc.get("code"),
+            name=doc.get("name", {}).get("content"),
+            description=doc.get("description", {}).get("content"),
+            destination=HbDestinations().get_by_destination_info(
+                doc.get("destinationCode"),
+                doc.get("stateCode"),
+                doc.get("zoneCode")
+            ),
+            coordinates=Coordinates(
+                longitude=doc.get("coordinates", {}).get("longitude"),
+                latitude=doc.get("coordinates", {}).get("latitude")
+            ),
+            category=None,
+            chain=None,
+            accommodation=None,
+            boards=None,
+            segments=None,
+            address=Address(
+                content=doc.get("address", {}).get("content"),
+                street=doc.get("address", {}).get("street"),
+                number=doc.get("address", {}).get("number")
+            ),
+            postal_code=doc.get("postalCode"),
+            city=doc.get("city", {}).get("content"),
+            email=doc.get("email"),
+            phones=self.convert_phones(doc.get("phones")),
+            rooms=None,
+            facilities=None,
+            terminals=None,
+            interest_points=None,
+            images=None,
+            web=doc.get("web"),
+            last_update=None,
+            S2C=doc.get("S2C"),
+            ranking=doc.get("ranking")
+        )
 
+    def get_dataclass_by_doc(self, doc, exclude=[]):
         return HotelData(
             code=doc.get("code"),
             name=doc.get("name", {}).get("content"),
@@ -89,6 +125,31 @@ class HbHotels(Hotels):
             ranking=doc.get("ranking")
         )
 
+    def get_by_code(self, code, exclude=[]):
+        doc = self.get_doc_by_code(int(code))
+        if not doc:
+            raise NotFound("Hotel not found!")
+
+        return self.get_dataclass_by_doc(code, exclude=[])
+    
+    def search(self, params):
+        filters = {}
+
+        if params.get("code"):
+            filters.update(
+                {"code": to_int(params.get("code"))}
+            )
+
+        if params.get("name"):
+            filters.update(
+                {"name.content": params.get("name")}
+            )
+
+        if params.get("offset") and params.get("limit"):
+            return [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters).skip(params.get("offset")).limit(params.get("limit")))]
+        
+        return [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters))]
+
 
 class HbHotelDetails(HotelDetails):
 
@@ -100,3 +161,5 @@ class HbHotelDetails(HotelDetails):
                                  "useSecondaryLanguage": False
         })
         self.collection_name = self.get_collection_name()
+
+

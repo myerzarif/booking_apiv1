@@ -6,7 +6,7 @@ from config.logger import LoggerMixin
 from .hotelbeds.hotels import HbHotels, HbDestinations
 from .base.locations import StaticCountries
 from dataclasses import asdict
-from .serializers import HotelContentSerializer, HotelContentQueryParamSerializer, DestinationSerializer, StaticCountrySerializer
+from .serializers import HotelContentSerializer, HotelContentQueryParamSerializer, DestinationSerializer, StaticCountrySerializer, HotelQueryParamSerializer, HotelListSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -63,3 +63,22 @@ class StaticCountriesView(LoggerMixin, generics.GenericAPIView):
         """
         countries = StaticCountries().get_static_countries()
         return Response(data=countries, status=200)
+
+
+class HotelContentView(LoggerMixin, generics.GenericAPIView):
+    """
+    Hotel Lists
+    """
+    permission_classes = []
+    serializer_class = HotelListSerializer
+
+    @swagger_auto_schema(query_serializer=HotelQueryParamSerializer)
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="GET", rate='60/h', block=True))
+    @method_decorator(ratelimit(key='header:x-forwarded-for', method="GET", rate='20/m', block=True))
+    def get(self, request, *args, **kwargs):
+        """
+        Get Hotel Info
+        """
+
+        hotels = HbHotels().search(params=request.query_params.dict())
+        return Response(data=hotels, status=200)

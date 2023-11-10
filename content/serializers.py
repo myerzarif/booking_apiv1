@@ -38,3 +38,19 @@ class StaticCountrySerializer(DataclassSerializer):
 
     class Meta:
         dataclass = StaticCountryListData
+
+
+class HotelListSerializer(serializers.Serializer):
+    """
+    Serializer for Hotel Content View
+    """
+
+    name = serializers.CharField()
+    code = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True)
+    active = serializers.BooleanField()
+
+
+class HotelQueryParamSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    code = serializers.IntegerField(required=False)

@@ -63,3 +63,8 @@ class HotelBookingQueryParamSerializer(serializers.Serializer):
     holder = HolderSerializer()
     rate_key = serializers.CharField(required=True)
     remark = serializers.CharField(required=False)
+
+
+class HotelQueryParamSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    code = serializers.CharField(required=False)
