@@ -78,7 +78,8 @@ class HbHotels(Hotels):
             web=doc.get("web"),
             last_update=None,
             S2C=doc.get("S2C"),
-            ranking=doc.get("ranking")
+            ranking=doc.get("ranking"),
+            active=doc.get("active"),
         )
 
     def get_dataclass_by_doc(self, doc, exclude=[]):
@@ -122,7 +123,8 @@ class HbHotels(Hotels):
             last_update=convert_string_to_date(
                 doc.get("lastUpdate"), "%Y-%m-%d"),
             S2C=doc.get("S2C"),
-            ranking=doc.get("ranking")
+            ranking=doc.get("ranking"),
+            active=doc.get("active"),
         )
 
     def get_by_code(self, code, exclude=[]):

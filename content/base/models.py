@@ -238,3 +238,4 @@ class HotelData:
     ranking: int
     terminals: str
     interest_points: str
+    active: bool
