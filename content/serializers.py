@@ -5,7 +5,9 @@ from rest_framework_dataclasses.serializers import DataclassSerializer
 from rest_framework import serializers
 from typing import Literal, Optional
 from common.types import HOTEL_INFO_EXCLUDE_OPTIONS
-
+from account.models import User
+from .hotelbeds.hotels import HbHotels
+from rest_framework import exceptions 
 
 class HotelContentSerializer(DataclassSerializer):
     """
@@ -54,3 +56,19 @@ class HotelListSerializer(serializers.Serializer):
 class HotelQueryParamSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     code = serializers.IntegerField(required=False)
+
+
+class HotelBlockSerializer(serializers.Serializer):
+    active = serializers.BooleanField(required=True)
+    code = serializers.CharField(required=True)
+
+    def block(self, data):
+        logged_in_user = None
+        request = self.context.get('request', None)
+        if request:
+            logged_in_user = request.user
+
+        if logged_in_user.role in [User.UserRole.TECH, User.UserRole.ADMIN]:
+            HbHotels().block(data.get("code"), data.get("active"))
+        else:
+            raise exceptions.PermissionDenied()

@@ -1,12 +1,12 @@
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework import generics, permissions
 from config.logger import LoggerMixin
 from .hotelbeds.hotels import HbHotels, HbDestinations
 from .base.locations import StaticCountries
 from dataclasses import asdict
-from .serializers import HotelContentSerializer, HotelContentQueryParamSerializer, DestinationSerializer, StaticCountrySerializer, HotelQueryParamSerializer, HotelListSerializer
+from .serializers import HotelContentSerializer, HotelContentQueryParamSerializer, DestinationSerializer, StaticCountrySerializer, HotelQueryParamSerializer, HotelListSerializer, HotelBlockSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -82,3 +82,13 @@ class HotelContentView(LoggerMixin, generics.GenericAPIView):
 
         hotels = HbHotels().search(params=request.query_params.dict())
         return Response(data=hotels, status=200)
+
+class HotelBlockUnblockView(LoggerMixin, generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = HotelBlockSerializer
+
+    def patch(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.block(serializer.validated_data)
+        return Response(data={'detail': 'Action done successfully!'}, status=200)

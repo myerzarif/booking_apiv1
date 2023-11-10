@@ -24,6 +24,7 @@ from content.base.hotels import (
 )
 from common.utils import to_int
 
+
 class HbHotels(Hotels):
 
     def __init__(self):
@@ -133,7 +134,7 @@ class HbHotels(Hotels):
             raise NotFound("Hotel not found!")
 
         return self.get_dataclass_by_doc(code, exclude=[])
-    
+
     def search(self, params):
         filters = {}
 
@@ -149,8 +150,12 @@ class HbHotels(Hotels):
 
         if params.get("offset") and params.get("limit"):
             return [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters).skip(params.get("offset")).limit(params.get("limit")))]
-        
+
         return [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters))]
+
+    def block(self, code, active):
+        mongo_default_db[self.collection_name].update_one(
+            {"code": to_int(code)}, {"$set": {"active": active}})
 
 
 class HbHotelDetails(HotelDetails):
@@ -163,5 +168,3 @@ class HbHotelDetails(HotelDetails):
                                  "useSecondaryLanguage": False
         })
         self.collection_name = self.get_collection_name()
-
-
