@@ -142,7 +142,7 @@ class HbHotels(Hotels):
 
         if params.get("name"):
             filters.update(
-                {"name.content": params.get("name")}
+                ({'name.content': {'$regex': params.get("name"), "$options": 'i'}})
             )
 
         if params.get("offset") and params.get("limit"):
