@@ -156,7 +156,8 @@ class HbHotels(Hotels):
     def block(self, code, active):
         mongo_default_db[self.collection_name].update_one(
             {"code": to_int(code)}, {"$set": {"active": active}})
-
+        mongo_default_db['search_info'].update_many(
+            {"hotel.code": to_int(code)}, {"$set": {"hotel.active": active, "info.hotel.active": active}})
 
 class HbHotelDetails(HotelDetails):
 

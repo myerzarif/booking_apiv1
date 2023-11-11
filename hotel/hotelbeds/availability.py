@@ -243,7 +243,11 @@ class HbAvailability(Availability):
             total_room=len(hotel.rooms)
         )
 
+    def get_active_hotels(self, hotels):
+        return [hotel for hotel in hotels if hotel["hotel"]["active"]]
+
     def create_availability_response(self, hotels):
+        hotels = self.get_active_hotels(hotels)
 
         response = {
             "hotels": hotels[:self.config.json.get("limit", 10)] if (self.config.json and self.config.json.get("limit")) else hotels,
@@ -370,7 +374,8 @@ class HbAvailability(Availability):
         mongo_default_db["search_info"].insert_one(item)
 
     def create_other_rooms(self, item_id):
-        item = mongo_default_db["search_info"].find_one({"item_id": item_id}, {"_id": 0})
+        item = mongo_default_db["search_info"].find_one(
+            {"item_id": item_id}, {"_id": 0})
         other_rooms = item.get("info", {}).get("rooms", [])
         for room in other_rooms:
             self.create_new_item(item, room, item_id)
