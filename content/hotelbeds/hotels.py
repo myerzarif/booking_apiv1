@@ -133,7 +133,7 @@ class HbHotels(Hotels):
         if not doc:
             raise NotFound("Hotel not found!")
 
-        return self.get_dataclass_by_doc(code, exclude=[])
+        return self.get_dataclass_by_doc(doc, exclude=[])
 
     def search(self, params):
         filters = {}

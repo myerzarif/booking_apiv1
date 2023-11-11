@@ -109,6 +109,7 @@ class HotelOtherRoomAvailabilityView(LoggerMixin, generics.GenericAPIView):
         response = HbAvailability().hotel_other_rooms_search(params.get("item_id"))
         return Response(data=response, status=200)
 
+
 class HotelOffersView(LoggerMixin, generics.GenericAPIView):
     """
     Hotel Offers
