@@ -232,7 +232,8 @@ class HbAvailability(Availability):
                                 destination=hotel.hotel.destination,
                                 coordinates=hotel.hotel.coordinates,
                                 images=hotel.hotel.images,
-                                S2C=hotel.hotel.S2C
+                                S2C=hotel.hotel.S2C,
+                                active=hotel.hotel.active
                                 ),
             room=self.suggested_room(hotel.rooms),
             rate=self.suggested_rate(hotel.rooms),

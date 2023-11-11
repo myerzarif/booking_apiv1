@@ -122,6 +122,7 @@ class ResponseHotel:
     coordinates: Coordinates
     images: List[ImageData]
     S2C: str
+    active: bool
 
 
 @dataclass
