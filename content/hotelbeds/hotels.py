@@ -148,10 +148,18 @@ class HbHotels(Hotels):
                 ({'name.content': {'$regex': params.get("name"), "$options": 'i'}})
             )
 
-        if params.get("offset") and params.get("limit"):
-            return [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters).skip(params.get("offset")).limit(params.get("limit")))]
+        data_with_filters = mongo_default_db[self.collection_name].find(filters)
+        total = len(list(data_with_filters))
 
-        return [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters))]
+        if params.get("offset") and params.get("limit"):
+            hotels = [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters).skip(to_int(params.get("offset"))).limit(to_int(params.get("limit"))))]
+        else:
+            hotels = [asdict(self.get_dataclass_by_doc_limited(item)) for item in list(mongo_default_db[self.collection_name].find(filters))]
+
+        return {
+            "hotels": hotels,
+            "total": total
+        }
 
     def block(self, code, active):
         mongo_default_db[self.collection_name].update_one(

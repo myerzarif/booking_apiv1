@@ -80,8 +80,8 @@ class HotelContentView(LoggerMixin, generics.GenericAPIView):
         Get Hotel Info
         """
 
-        hotels = HbHotels().search(params=request.query_params.dict())
-        return Response(data=hotels, status=200)
+        result = HbHotels().search(params=request.query_params.dict())
+        return Response(data=result, status=200)
 
 class HotelBlockUnblockView(LoggerMixin, generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]

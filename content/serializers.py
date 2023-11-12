@@ -56,6 +56,8 @@ class HotelListSerializer(serializers.Serializer):
 class HotelQueryParamSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     code = serializers.IntegerField(required=False)
+    offset = serializers.IntegerField(required=False)
+    limit = serializers.IntegerField(required=False)
 
 
 class HotelBlockSerializer(serializers.Serializer):
