@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from config.logger import LoggerMixin
 from transaction.serializers import TransactionSerializer, ReservationSerializer, ReservationDetailSerializer, PaymentSerializer, StripeWebhookSerializer
 from rest_framework import generics, exceptions, permissions
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
 from common.pagination import MediumResultsSetPagination
 from django_filters import rest_framework as filters
 from rest_framework import filters as rest_filter
@@ -33,6 +33,16 @@ class TransactionView(LoggerMixin, ListAPIView):
         if self.request.user.role == User.UserRole.DEFAULT:
             return Transaction.objects.all().filter(active=True, user_id=self.request.user.id)
         return Transaction.objects.all().filter(active=True)
+
+
+class TransactionDetailView(LoggerMixin, RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = TransactionSerializer
+        
+    def get_queryset(self):
+        if self.request.user.role == User.UserRole.DEFAULT:
+            raise exceptions.PermissionDenied()
+        return Transaction.objects.filter(pk=self.request.parser_context['kwargs'].get('pk'))
 
 
 class ReservationView(LoggerMixin, generics.GenericAPIView):
