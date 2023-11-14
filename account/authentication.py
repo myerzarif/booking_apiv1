@@ -37,7 +37,8 @@ class CustomizeTokenAuthentication(TokenAuthentication):
     model = AccessToken
 
     def authenticate(self, request):
-        self.user_agent_hash = get_user_agent_header(request)
+        # self.user_agent_hash = get_user_agent_header(request)
+        self.user_agent_hash = ""
         return super(CustomizeTokenAuthentication, self).authenticate(request)
 
     def authenticate_credentials(self, key):
