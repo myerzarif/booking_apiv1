@@ -1,4 +1,4 @@
-# Booking Platform Using Hotelbeds for booking engine, Stripe for payment, Google for authentication
+# Booking Platform using Hotelbeds for booking engine, Stripe for payment, Google for authentication
 
 --------------------------
 
