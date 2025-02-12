@@ -1,16 +1,8 @@
-# Booking Platform API VERSION 1
-
-## INSTALL Requirements and start app without docker (docker instructions are listed at the next section and its recommended to use docker to run the project)
-- python3 -m venv .venv
-- source .venv/bin/activate
-- pip install -r requirements.txt
-- cp .env.sample .env (edit .env file)
-- python manage.py runserver
-- make sure you installed and configured redis, postgres and nginx on your server
+# Booking Platform Using Hotelbeds for booking engine, Stripe for payment, Google for authentication
 
 --------------------------
 
-## StartApp by Docker
+## Setup and start app by Docker
 - sudo docker network create booking_apiv1_network 
 - sudo docker volume create --name=booking_apiv1_psql
 - cp .env.sample .env (edit .env file)
@@ -21,6 +13,17 @@
 To reset the app:
 - sudo docker-compose down; sudo docker-compose up -d
 - docker compose down; docker compose up -d
+
+--------------------------
+
+## INSTALL Requirements and start app without docker (docker instructions are listed at the next section and its recommended to use docker to run the project)
+- python3 -m venv .venv
+- source .venv/bin/activate
+- pip install -r requirements.txt
+- cp .env.sample .env (edit .env file)
+- python manage.py runserver
+- make sure you installed and configured redis, postgres and nginx on your server
+
 --------------------------
 
 ## Testing
@@ -100,11 +103,10 @@ mongorestore --uri mongodb://bookingusr:B016eJ9Gej8@localhost:27018/ --db bookin
 
 ## stripe test card
 <!-- 4242424242424242 -->
-
+https://github.com/stripe-samples/accept-a-payment/blob/main/custom-payment-flow/server/python/server.py
 
 ## indexes
 We should run content.hotelbed.commands --> initial_indexes
 db.search_info.createIndex( { "expiry_date": 1 }, { expireAfterSeconds: 0 })
 
 
-https://github.com/stripe-samples/accept-a-payment/blob/main/custom-payment-flow/server/python/server.py
